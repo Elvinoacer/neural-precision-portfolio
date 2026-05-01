@@ -3,17 +3,14 @@ import Image from "next/image";
 export default function AboutSection() {
   return (
     <section
-      className="w-full py-32 relative bg-surface-container-lowest overflow-hidden"
+      className="w-full py-20 md:py-32 relative bg-surface-container-lowest overflow-hidden section-divider"
       id="about"
     >
-      {/* Editorial Background Lines */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-      
-      <div className="max-w-[1400px] mx-auto px-8 w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-          
-          <div className="lg:col-span-5 relative group perspective-1000">
-            {/* Premium Editorial Frame */}
+      <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+
+          {/* Portrait */}
+          <div className="lg:col-span-5 relative group">
             <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden premium-border glass-panel transition-transform duration-700 group-hover:scale-[1.02]">
               <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-overlay"></div>
               <Image
@@ -24,29 +21,29 @@ export default function AboutSection() {
                 height={1000}
                 unoptimized
               />
-              {/* Subtle Lighting overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-lowest via-transparent to-transparent opacity-80 z-20"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent opacity-70 z-20"></div>
             </div>
-            {/* Floating Info Tag */}
-            <div className="absolute -bottom-6 -right-6 glass-pill px-8 py-6 rounded-2xl z-30 shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl animate-float">
-              <div className="font-display text-3xl text-white font-light tracking-tight">Est. 2020</div>
-              <div className="font-label-mono text-xs tracking-widest text-primary uppercase mt-1">Data & Operations</div>
+            {/* Floating Info Tag — repositioned for mobile */}
+            <div className="absolute -bottom-4 right-2 sm:-bottom-6 sm:-right-4 glass-pill px-6 py-4 sm:px-8 sm:py-6 rounded-2xl z-30 shadow-[0_16px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl animate-float">
+              <div className="font-display text-2xl sm:text-3xl text-white font-light tracking-tight">Est. 2020</div>
+              <div className="font-label-mono text-[10px] sm:text-xs tracking-widest text-primary uppercase mt-1">Data &amp; Operations</div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-12 lg:pl-12">
-            <div className="space-y-6 mt-12 lg:mt-0">
-              <h2 className="font-display text-4xl md:text-6xl text-white tracking-tight font-light flex flex-col">
-                <span className="text-on-surface-variant text-xl tracking-widest uppercase mb-4 font-label-mono flex items-center gap-4">
-                  <span className="w-12 h-[1px] bg-primary"></span>
+          {/* Content */}
+          <div className="lg:col-span-7 space-y-8 md:space-y-12 lg:pl-8 mt-8 lg:mt-0">
+            <div className="space-y-5">
+              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight font-light flex flex-col">
+                <span className="text-on-surface-variant text-sm sm:text-base md:text-xl tracking-widest uppercase mb-3 md:mb-4 font-label-mono flex items-center gap-3 md:gap-4">
+                  <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
                   Who I Am
                 </span>
                 The Bridge Between <br/>
-                <span className="font-bold text-gradient-primary">Raw Data & AI</span>
+                <span className="font-bold text-gradient-primary">Raw Data &amp; AI</span>
               </h2>
             </div>
-            
-            <div className="font-body-lg text-lg md:text-xl text-on-surface-variant space-y-6 font-light leading-relaxed">
+
+            <div className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant space-y-5 leading-relaxed">
               <p>
                 I am a detail-oriented professional specializing in bridging the
                 gap between raw data and intelligent systems. With extensive
@@ -61,42 +58,42 @@ export default function AboutSection() {
                 enterprise clients alike.
               </p>
             </div>
-            
-            {/* Stats Grid - Premium Refinement */}
-            <div className="grid grid-cols-2 gap-6 pt-8">
-              <div className="glass-panel p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-primary/50 relative overflow-hidden group">
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6 pt-4 md:pt-8">
+              <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-primary/50 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="font-display text-5xl font-light text-white mb-2">
+                <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
                   150<span className="text-primary">+</span>
                 </span>
-                <span className="font-label-mono text-xs tracking-widest uppercase text-on-surface-variant">
-                  Projects Completed
+                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
+                  Projects
                 </span>
               </div>
-              <div className="glass-panel p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-secondary/50 relative overflow-hidden group">
+              <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-secondary/50 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="font-display text-5xl font-light text-white mb-2">
+                <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
                   5k<span className="text-secondary">+</span>
                 </span>
-                <span className="font-label-mono text-xs tracking-widest uppercase text-on-surface-variant">
+                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
                   Annotation Hours
                 </span>
               </div>
-              <div className="glass-panel p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-tertiary/50 relative overflow-hidden group">
+              <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-tertiary/50 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-tertiary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="font-display text-5xl font-light text-white mb-2">
+                <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
                   40<span className="text-tertiary">+</span>
                 </span>
-                <span className="font-label-mono text-xs tracking-widest uppercase text-on-surface-variant">
-                  Satisfied Clients
+                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
+                  Clients
                 </span>
               </div>
-              <div className="glass-panel p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-white/50 relative overflow-hidden group">
+              <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-white/30 relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="font-display text-5xl font-light text-white mb-2">
+                <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
                   12
                 </span>
-                <span className="font-label-mono text-xs tracking-widest uppercase text-on-surface-variant">
+                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
                   Tools Mastered
                 </span>
               </div>
