@@ -66,6 +66,7 @@ export default function HeroSection() {
               playsInline
               preload="auto"
             >
+              <source src="/images/videos/mp_.mp4" type="video/mp4" />
               <source src="/images/videos/mp_.mov" type="video/quicktime" />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/45 to-transparent z-10 pointer-events-none"></div>
