@@ -17,8 +17,11 @@ export default function HeroSection() {
 
           <div className="space-y-5">
             <h1 className="font-display text-[2.5rem] leading-[1.1] sm:text-5xl md:text-7xl lg:text-[80px] font-medium tracking-tight">
-              Precision Data.<br />
-              <span className="text-gradient-primary font-bold">Seamless Assistance.</span>
+              Precision Data.
+              <br />
+              <span className="text-gradient-primary font-bold">
+                Seamless Assistance.
+              </span>
             </h1>
             <p className="font-label-mono text-xs sm:text-sm text-primary uppercase tracking-widest border-l-2 border-primary/40 pl-4">
               AI Data Annotator · LLM Trainer · Virtual Assistant
@@ -26,9 +29,9 @@ export default function HeroSection() {
           </div>
 
           <p className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed">
-            I help elite AI teams build smarter models through high-fidelity data
-            annotation. I also provide meticulous virtual assistance to keep your
-            operations running seamlessly, from anywhere in the world.
+            I help elite AI teams build smarter models through high-fidelity
+            data annotation. I also provide meticulous virtual assistance to
+            keep your operations running seamlessly, from anywhere in the world.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full">
@@ -37,7 +40,9 @@ export default function HeroSection() {
               href="#services"
             >
               <span className="relative z-10">View Services</span>
-              <span className="material-symbols-outlined text-base relative z-10 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              <span className="material-symbols-outlined text-base relative z-10 group-hover:translate-x-1 transition-transform">
+                arrow_forward
+              </span>
             </a>
             <a
               className="relative group overflow-hidden bg-transparent border border-white/15 text-white font-label-mono text-xs sm:text-sm uppercase tracking-widest px-8 py-4 sm:py-5 rounded-full hover:border-white/30 hover:bg-white/5 transition-all duration-500 w-full sm:w-auto text-center"
@@ -52,21 +57,28 @@ export default function HeroSection() {
         <div className="lg:col-span-5 relative h-[400px] md:h-[500px] lg:h-[600px] w-full hidden md:block animate-float">
           <div className="absolute inset-0 premium-border rounded-2xl glass-panel overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             <div className="absolute inset-0 scanline-overlay z-20 mix-blend-overlay opacity-40"></div>
-            <div
-              className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620121692029-d088224ddc74?auto=format&fit=crop&q=80&w=1000')] bg-cover bg-center opacity-35 mix-blend-luminosity z-0"
-              role="img"
-              aria-label="Abstract digital art"
-            ></div>
-            <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,212,255,0.08)] z-10 pointer-events-none"></div>
+            <video
+              autoPlay
+              poster="/images/everlyn_linda_photo.webp"
+              className="absolute inset-0 h-full w-full object-cover object-center opacity-100"
+              loop
+              muted
+              playsInline
+              preload="auto"
+            >
+              <source src="/images/videos/mp_.mov" type="video/quicktime" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/45 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,212,255,0.08)] z-20 pointer-events-none"></div>
 
-            <div className="absolute top-1/4 left-[10%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-white z-10 animate-float-delayed shadow-lg">
-              CVAT
+            <div className="absolute top-1/4 left-[10%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-white z-30 animate-float-delayed shadow-lg">
+              Everlyn Linda
             </div>
-            <div className="absolute bottom-1/3 right-[15%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-white z-10 animate-float shadow-lg">
-              Labelbox
+            <div className="absolute bottom-1/3 right-[15%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-white z-30 animate-float shadow-lg">
+              Virtual Assistant
             </div>
-            <div className="absolute top-1/2 left-[35%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-primary z-10 animate-float shadow-lg">
-              Segmentation
+            <div className="absolute top-1/2 left-[35%] glass-pill px-5 py-3 rounded-full font-label-mono text-xs tracking-widest text-primary z-30 animate-float shadow-lg">
+              AI Data Annotator
             </div>
           </div>
         </div>

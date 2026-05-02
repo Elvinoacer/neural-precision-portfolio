@@ -8,15 +8,14 @@ export default function AboutSection() {
     >
       <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-
           {/* Portrait */}
           <div className="lg:col-span-5 relative group">
             <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden premium-border glass-panel transition-transform duration-700 group-hover:scale-[1.02]">
               <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-overlay"></div>
               <Image
-                alt="Professional Portrait"
+                alt="Everlyn Linda portrait"
                 className="w-full h-full object-cover filter grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGBqVbzARf9c4jGa2B9S0rawdDdTv0VBA20AlDXJ9SimmsfQsjYdVYEwQ2TP6tSXjpNe_Aq5YCwkAU1kvUq_MbbrtA289foPzIPjPWCd8mNxoHIN43QyXNmAZNjSkgVwunyfWi547H1bGLXOouQ6enmK45oNNSSw3BKEo-8jJnA5FQIhPSitbDXwHA4D_IzClLWAQma6YE522AwUBh90LTdRp_pOmyD4mfLDjYxRr7ITfvZ-3PkQCtyu3_u4YRkufXCUUY0YLQYuix"
+                src="/images/everlyn_linda_photo.webp"
                 width={800}
                 height={1000}
                 unoptimized
@@ -25,8 +24,12 @@ export default function AboutSection() {
             </div>
             {/* Floating Info Tag — repositioned for mobile */}
             <div className="absolute -bottom-4 right-2 sm:-bottom-6 sm:-right-4 glass-pill px-6 py-4 sm:px-8 sm:py-6 rounded-2xl z-30 shadow-[0_16px_40px_rgba(0,0,0,0.4)] backdrop-blur-2xl animate-float">
-              <div className="font-display text-2xl sm:text-3xl text-white font-light tracking-tight">Est. 2020</div>
-              <div className="font-label-mono text-[10px] sm:text-xs tracking-widest text-primary uppercase mt-1">Data &amp; Operations</div>
+              <div className="font-display text-2xl sm:text-3xl text-white font-light tracking-tight">
+                Est. 2020
+              </div>
+              <div className="font-label-mono text-[10px] sm:text-xs tracking-widest text-primary uppercase mt-1">
+                Data &amp; Operations
+              </div>
             </div>
           </div>
 
@@ -38,8 +41,10 @@ export default function AboutSection() {
                   <span className="w-8 md:w-12 h-[1px] bg-primary"></span>
                   Who I Am
                 </span>
-                The Bridge Between <br/>
-                <span className="font-bold text-gradient-primary">Raw Data &amp; AI</span>
+                The Bridge Between <br />
+                <span className="font-bold text-gradient-primary">
+                  Raw Data &amp; AI
+                </span>
               </h2>
             </div>
 
