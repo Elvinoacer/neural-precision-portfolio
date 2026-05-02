@@ -4,9 +4,33 @@ import Link from "next/link";
 import CTASection from "../components/CTASection";
 
 export const metadata: Metadata = {
-  title: "About Everlyn Linda | Data Annotation Specialist & Virtual Assistant",
+  title: "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
   description:
-    "Learn about Everlyn Linda — a detail-oriented data annotation specialist and virtual assistant based in Kenya, helping teams work smarter with accurate data and reliable support.",
+    "Meet Everlyn Linda — a detail-oriented data annotation specialist and virtual assistant based in Kenya. 150+ projects, 5000+ annotation hours, serving AI teams and businesses worldwide with accurate data work and reliable remote support.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
+    description:
+      "Meet Everlyn Linda — a detail-oriented data annotation specialist and virtual assistant based in Kenya, helping teams work smarter with accurate data and reliable support.",
+    url: "/about",
+    type: "profile",
+    images: [
+      {
+        url: "/images/everlyn_linda_photo.webp",
+        width: 1200,
+        height: 630,
+        alt: "Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
+    description:
+      "150+ projects, 5000+ annotation hours. Detail-oriented data annotation specialist & virtual assistant based in Kenya.",
+  },
 };
 
 export default function AboutPage() {

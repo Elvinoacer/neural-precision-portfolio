@@ -4,10 +4,33 @@ import Link from "next/link";
 import CTASection from "../components/CTASection";
 
 export const metadata: Metadata = {
-  title:
-    "Services | Data Annotation, Virtual Assistance & AI Training | Everlyn Linda",
+  title: "Services — Data Annotation, Virtual Assistance & AI Training",
   description:
-    "Hire Everlyn Linda for data annotation, image segmentation, virtual assistant services, customer support, and AI/LLM training support. Clear service breakdowns and pricing.",
+    "Hire Everlyn Linda for data annotation, image segmentation, virtual assistant services, customer support, and AI/LLM training support. Clear service breakdowns with detailed capabilities.",
+  alternates: {
+    canonical: "/services",
+  },
+  openGraph: {
+    title: "Services — Data Annotation, Virtual Assistance & AI Training | Everlyn Linda",
+    description:
+      "Professional data annotation, image segmentation, virtual assistant, customer support, and AI training services. Detailed service breakdowns and capabilities.",
+    url: "/services",
+    type: "website",
+    images: [
+      {
+        url: "/images/everlyn_linda_photo.webp",
+        width: 1200,
+        height: 630,
+        alt: "Everlyn Linda Services — Data Annotation & Virtual Assistance",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Services — Data Annotation, VA & AI Training | Everlyn Linda",
+    description:
+      "Professional data annotation, virtual assistant, customer support, and AI training services by Everlyn Linda.",
+  },
 };
 
 const services = [

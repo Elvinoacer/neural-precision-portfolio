@@ -1,0 +1,8 @@
+# Neural Precision by Everlyn Linda
+# Data Annotation Specialist & Virtual Assistant
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://neuralprecision.co.ke/sitemap.xml

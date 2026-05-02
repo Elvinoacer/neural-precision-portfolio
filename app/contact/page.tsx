@@ -5,8 +5,33 @@ const WHATSAPP_URL =
   "https://wa.me/254792038496?text=Hello%20Everlyn%2C%20I%20visited%20your%20website%20and%20I%20would%20like%20to%20inquire%20about%20your%20services.";
 
 export const metadata: Metadata = {
-  title: "Contact & Hire Everlyn Linda | Data Annotation & Virtual Assistant",
-  description: "Get in touch with Everlyn Linda for data annotation, virtual assistance, customer support, and AI training. Book a free consultation or send a project request.",
+  title: "Contact & Hire Everlyn Linda — Book a Free Consultation",
+  description:
+    "Get in touch with Everlyn Linda for data annotation, virtual assistance, customer support, and AI training. Book a free consultation via WhatsApp, send a project request, or email directly. Response within 24 hours.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact & Hire Everlyn Linda — Data Annotation & Virtual Assistant",
+    description:
+      "Book a free consultation, send a project request, or reach out via WhatsApp. Data annotation, virtual assistance, and AI training support. Response within 24 hours.",
+    url: "/contact",
+    type: "website",
+    images: [
+      {
+        url: "/images/everlyn_linda_photo.webp",
+        width: 1200,
+        height: 630,
+        alt: "Contact Everlyn Linda — Hire a Data Annotation Specialist",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact & Hire Everlyn Linda | Neural Precision",
+    description:
+      "Book a free consultation for data annotation, virtual assistance, customer support, or AI training. Response within 24 hours.",
+  },
 };
 
 export default function ContactPage() {

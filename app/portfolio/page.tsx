@@ -3,9 +3,34 @@ import Image from "next/image";
 import CTASection from "../components/CTASection";
 
 export const metadata: Metadata = {
-  title: "Work Samples & Portfolio | Data Annotation & VA | Everlyn Linda",
+  title: "Work Samples & Portfolio — Data Annotation, VA & Customer Support",
   description:
-    "View Everlyn Linda's work samples: data annotation projects, image segmentation, road hazard detection, LLM evaluation, virtual assistant workflows, and customer support examples.",
+    "View Everlyn Linda's work samples: semantic segmentation, road hazard bounding box annotation, LLM evaluation, data entry workflows, email management templates, and customer support examples. Evidence of quality and precision.",
+  alternates: {
+    canonical: "/portfolio",
+  },
+  openGraph: {
+    title: "Work Samples & Portfolio — Data Annotation & Virtual Assistant | Everlyn Linda",
+    description:
+      "View Everlyn Linda's portfolio: data annotation projects, image segmentation samples, virtual assistant workflows, and customer support case studies.",
+    url: "/portfolio",
+    type: "website",
+    images: [
+      {
+        url: "/images/i1.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "Everlyn Linda Portfolio — Semantic Segmentation Sample",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Work Samples & Portfolio | Everlyn Linda",
+    description:
+      "Data annotation, image segmentation, VA workflows, and customer support samples. Evidence of quality and precision.",
+    images: ["/images/i1.jpeg"],
+  },
 };
 
 const annotationSamples = [
