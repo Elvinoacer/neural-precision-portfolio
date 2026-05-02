@@ -22,7 +22,8 @@ const SITE_NAME = "Neural Precision by Everlyn Linda";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Data Annotation, Data Entry & Virtual Assistant Services | Everlyn Linda — Neural Precision",
+    default:
+      "Data Annotation, Data Entry & Virtual Assistant Services | Everlyn Linda — Neural Precision",
     template: "%s | Neural Precision",
   },
   description:
@@ -77,7 +78,7 @@ export const metadata: Metadata = {
       "Hire Everlyn Linda for accurate data annotation, data entry, image segmentation, AI training support, and virtual assistant services. Reliable remote support for growing teams.",
     images: [
       {
-        url: "/images/everlyn_linda_photo.webp",
+        url: "/images/banner3.webp",
         width: 1200,
         height: 630,
         alt: "Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
@@ -90,7 +91,7 @@ export const metadata: Metadata = {
     title: "Data Annotation, Data Entry & Virtual Assistant | Everlyn Linda",
     description:
       "Hire Everlyn Linda for accurate data annotation, data entry, image segmentation, AI training support, and virtual assistant services.",
-    images: ["/images/everlyn_linda_photo.webp"],
+    images: ["/images/banner3.webp"],
     creator: "@everlynlinda",
   },
   category: "Professional Services",
@@ -111,7 +112,8 @@ export default function RootLayout({
     founder: {
       "@type": "Person",
       name: "Everlyn Linda",
-      jobTitle: "Data Annotation Specialist, Data Entry Expert & Virtual Assistant",
+      jobTitle:
+        "Data Annotation Specialist, Data Entry Expert & Virtual Assistant",
       url: SITE_URL,
       address: {
         "@type": "PostalAddress",
