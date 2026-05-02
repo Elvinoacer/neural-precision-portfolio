@@ -16,7 +16,7 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
 });
 
-const SITE_URL = "https://neuralprecision.co.ke";
+const SITE_URL = "https://neural-precision-portfolio.vercel.app";
 const SITE_NAME = "Neural Precision by Everlyn Linda";
 
 export const metadata: Metadata = {
