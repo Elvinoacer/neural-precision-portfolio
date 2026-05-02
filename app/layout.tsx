@@ -30,6 +30,26 @@ export const metadata: Metadata = {
     "remote assistant",
     "Everlyn Linda",
   ],
+  openGraph: {
+    title: "Data Annotation Specialist & Virtual Assistant | Everlyn Linda",
+    description:
+      "Hire Everlyn Linda for data annotation, image segmentation, AI training support, data entry, customer service, and virtual assistant services.",
+    images: [
+      {
+        url: "/images/poster2.webp",
+        width: 1200,
+        height: 630,
+        alt: "Everlyn Linda social share banner",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Data Annotation Specialist & Virtual Assistant | Everlyn Linda",
+    description:
+      "Hire Everlyn Linda for data annotation, image segmentation, AI training support, data entry, customer service, and virtual assistant services.",
+    images: ["/images/poster2.webp"],
+  },
 };
 
 export default function RootLayout({
