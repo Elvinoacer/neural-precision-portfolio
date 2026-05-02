@@ -7,11 +7,20 @@ export default function Footer() {
     { name: "Contact", href: "#contact" },
   ];
 
+  const contactLinks = [
+    { name: "Email", href: "mailto:lindahlish18@gmail.com" },
+    {
+      name: "LinkedIn",
+      href: "https://www.linkedin.com/in/lindahlish2043",
+      external: true,
+    },
+    { name: "Phone", href: "tel:+254792038496" },
+  ];
+
   return (
     <footer className="bg-surface-container-lowest w-full py-12 md:py-16 relative z-20 section-divider">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
-
           {/* Column 1: Brand */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2.5">
@@ -20,15 +29,24 @@ export default function Footer() {
                   <span className="w-2 h-2 bg-primary rounded-full"></span>
                 </span>
               </span>
-              <span className="font-display text-white tracking-widest uppercase text-sm font-medium">Neural Precision</span>
+              <span className="font-display text-white tracking-widest uppercase text-sm font-medium">
+                Neural Precision
+              </span>
             </div>
             <p className="text-on-surface-variant text-sm font-body-md leading-relaxed max-w-xs">
-              Precision Data. Seamless Assistance. Empowering AI teams worldwide.
+              Precision Data. Seamless Assistance. Empowering AI teams
+              worldwide.
             </p>
             <div className="flex gap-5 mt-2">
-              {['LinkedIn', 'GitHub', 'Twitter'].map(social => (
-                <a key={social} className="text-muted hover:text-white transition-colors text-sm font-label-mono tracking-wider uppercase" href="#">
-                  {social}
+              {contactLinks.map((link) => (
+                <a
+                  key={link.name}
+                  className="text-muted hover:text-white transition-colors text-sm font-label-mono tracking-wider uppercase"
+                  href={link.href}
+                  rel={link.external ? "noreferrer" : undefined}
+                  target={link.external ? "_blank" : undefined}
+                >
+                  {link.name}
                 </a>
               ))}
             </div>
@@ -36,11 +54,16 @@ export default function Footer() {
 
           {/* Column 2: Navigation */}
           <div className="flex flex-col gap-4">
-            <h4 className="font-label-mono text-[10px] uppercase tracking-widest text-muted mb-1">Navigation</h4>
+            <h4 className="font-label-mono text-[10px] uppercase tracking-widest text-muted mb-1">
+              Navigation
+            </h4>
             <ul className="flex flex-col gap-3">
-              {navLinks.map(link => (
+              {navLinks.map((link) => (
                 <li key={link.name}>
-                  <a className="text-on-surface-variant hover:text-white transition-colors text-sm font-body-md" href={link.href}>
+                  <a
+                    className="text-on-surface-variant hover:text-white transition-colors text-sm font-body-md"
+                    href={link.href}
+                  >
                     {link.name}
                   </a>
                 </li>
