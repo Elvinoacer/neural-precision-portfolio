@@ -117,14 +117,14 @@ export default function ServicesPage() {
         <div className="absolute inset-0 z-0">
           <Image
             alt="Everlyn Linda services hero banner"
-            className="object-cover object-center opacity-30"
+            className="object-cover object-center opacity-50"
             fill
             priority
             sizes="100vw"
             src="/images/services-hero.webp"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/80 to-surface-container-lowest/45"></div>
-          <div className="absolute inset-0 bg-black/15"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/68 to-surface-container-lowest/25"></div>
+          <div className="absolute inset-0 bg-black/8"></div>
         </div>
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/6 rounded-full blur-[150px] pointer-events-none z-0"></div>
         <div className="max-w-[1400px] mx-auto px-5 md:px-8 relative z-10">

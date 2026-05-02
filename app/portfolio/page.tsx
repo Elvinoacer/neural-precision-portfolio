@@ -86,14 +86,14 @@ export default function PortfolioPage() {
         <div className="absolute inset-0 z-0">
           <Image
             alt="Everlyn Linda portfolio hero banner"
-            className="object-cover object-center opacity-30"
+            className="object-cover object-center opacity-50"
             fill
             priority
             sizes="100vw"
             src="/images/portfolio-hero.webp"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/80 to-surface-container-lowest/40"></div>
-          <div className="absolute inset-0 bg-black/15"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/68 to-surface-container-lowest/25"></div>
+          <div className="absolute inset-0 bg-black/8"></div>
         </div>
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/6 rounded-full blur-[150px] pointer-events-none z-0"></div>
         <div className="max-w-[1400px] mx-auto px-5 md:px-8 relative z-10 text-center">

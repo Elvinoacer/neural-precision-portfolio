@@ -34,14 +34,14 @@ export default function AboutPage() {
         <div className="absolute inset-0 z-0">
           <Image
             alt="Everlyn Linda about hero banner"
-            className="object-cover object-center opacity-30"
+            className="object-cover object-center opacity-50"
             fill
             priority
             sizes="100vw"
             src="/images/about-hero.webp"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/85 to-surface-container-lowest/35"></div>
-          <div className="absolute inset-0 bg-black/15"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/70 to-surface-container-lowest/25"></div>
+          <div className="absolute inset-0 bg-black/8"></div>
         </div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/6 rounded-full blur-[150px] pointer-events-none z-0"></div>
         <div className="max-w-[1400px] mx-auto px-5 md:px-8 relative z-10">
