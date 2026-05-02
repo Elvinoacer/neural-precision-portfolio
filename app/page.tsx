@@ -1,27 +1,23 @@
-import NavBar from "./components/NavBar";
 import HeroSection from "./components/HeroSection";
-import AboutSection from "./components/AboutSection";
-import ServicesSection from "./components/ServicesSection";
-import ToolkitSection from "./components/ToolkitSection";
+import PainPointsSection from "./components/PainPointsSection";
+import ServicesSnapshot from "./components/ServicesSnapshot";
+import WhoIHelpSection from "./components/WhoIHelpSection";
 import WhyChooseMeSection from "./components/WhyChooseMeSection";
-import PortfolioGallerySection from "./components/PortfolioGallerySection";
-import ContactSection from "./components/ContactSection";
-import Footer from "./components/Footer";
+import ProcessSection from "./components/ProcessSection";
+import ProofSection from "./components/ProofSection";
+import CTASection from "./components/CTASection";
 
 export default function Home() {
   return (
     <>
-      <NavBar />
-      <main className="flex-grow w-full relative z-10 flex flex-col items-center">
-        <HeroSection />
-        <AboutSection />
-        <ServicesSection />
-        <ToolkitSection />
-        <WhyChooseMeSection />
-        <PortfolioGallerySection />
-        <ContactSection />
-      </main>
-      <Footer />
+      <HeroSection />
+      <PainPointsSection />
+      <ServicesSnapshot />
+      <WhoIHelpSection />
+      <WhyChooseMeSection />
+      <ProcessSection />
+      <ProofSection />
+      <CTASection />
     </>
   );
 }

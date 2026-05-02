@@ -1,10 +1,15 @@
+import Link from "next/link";
+
+const WHATSAPP_URL =
+  "https://wa.me/254792038496?text=Hello%20Everlyn%2C%20I%20visited%20your%20website%20and%20I%20would%20like%20to%20inquire%20about%20your%20services.";
+
 export default function Footer() {
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Services", href: "#services" },
-    { name: "Tools", href: "#tools" },
-    { name: "Portfolio", href: "#portfolio" },
-    { name: "Contact", href: "#contact" },
+    { name: "Home", href: "/" },
+    { name: "Services", href: "/services" },
+    { name: "Work Samples", href: "/portfolio" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
   const contactLinks = [
@@ -14,6 +19,7 @@ export default function Footer() {
       href: "https://www.linkedin.com/in/lindahlish2043",
       external: true,
     },
+    { name: "WhatsApp", href: WHATSAPP_URL, external: true },
     { name: "Phone", href: "tel:+254792038496" },
   ];
 
@@ -23,7 +29,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
           {/* Column 1: Brand */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5">
               <span className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-[1px]">
                 <span className="w-full h-full bg-surface-container-lowest rounded-full flex items-center justify-center">
                   <span className="w-2 h-2 bg-primary rounded-full"></span>
@@ -32,12 +38,11 @@ export default function Footer() {
               <span className="font-display text-white tracking-widest uppercase text-sm font-medium">
                 Neural Precision
               </span>
-            </div>
+            </Link>
             <p className="text-on-surface-variant text-sm font-body-md leading-relaxed max-w-xs">
-              Precision Data. Seamless Assistance. Empowering AI teams
-              worldwide.
+              Human Precision for Data, AI, and Digital Operations.
             </p>
-            <div className="flex gap-5 mt-2">
+            <div className="flex flex-wrap gap-4 mt-2">
               {contactLinks.map((link) => (
                 <a
                   key={link.name}
@@ -60,18 +65,18 @@ export default function Footer() {
             <ul className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <li key={link.name}>
-                  <a
+                  <Link
                     className="text-on-surface-variant hover:text-white transition-colors text-sm font-body-md"
                     href={link.href}
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Status */}
+          {/* Column 3: Status + WhatsApp */}
           <div className="flex flex-col gap-4 items-start lg:items-end">
             <h4 className="font-label-mono text-[10px] uppercase tracking-widest text-muted mb-1 text-left lg:text-right w-full">
               Status
@@ -82,13 +87,23 @@ export default function Footer() {
                 Available for Projects
               </span>
             </div>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-whatsapp font-label-mono text-xs uppercase tracking-widest px-6 py-3 rounded-full inline-flex items-center gap-2 mt-2"
+            >
+              <span className="material-symbols-outlined text-base">chat</span>
+              Chat on WhatsApp
+            </a>
           </div>
         </div>
 
         {/* Bottom bar */}
         <div className="border-t border-white/5 pt-8 text-center">
           <p className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-muted">
-            © 2024 Neural Precision. Data-Driven Excellence.
+            © {new Date().getFullYear()} Neural Precision by Everlyn Linda.
+            Data-Driven Excellence.
           </p>
         </div>
       </div>
