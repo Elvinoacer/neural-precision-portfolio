@@ -22,17 +22,20 @@ const SITE_NAME = "Neural Precision by Everlyn Linda";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Data Annotation Specialist & Virtual Assistant | Everlyn Linda — Neural Precision",
+    default: "Data Annotation, Data Entry & Virtual Assistant Services | Everlyn Linda — Neural Precision",
     template: "%s | Neural Precision",
   },
   description:
-    "Hire Everlyn Linda for accurate data annotation, image segmentation, AI training support, data entry, customer service, and virtual assistant services. Reliable remote support for growing teams in Kenya and worldwide.",
+    "Hire Everlyn Linda for accurate data annotation, data entry & management, image segmentation, AI training support, customer service, and virtual assistant services. Reliable remote support for growing teams in Kenya and worldwide.",
   keywords: [
     "data annotation specialist",
+    "data entry services",
+    "data entry specialist Kenya",
     "virtual assistant Kenya",
     "image segmentation services",
     "AI training support",
-    "data entry services",
+    "spreadsheet data entry",
+    "database management",
     "customer support outsourcing",
     "remote virtual assistant",
     "Everlyn Linda",
@@ -42,7 +45,7 @@ export const metadata: Metadata = {
     "data labeling",
     "bounding box annotation",
     "semantic segmentation",
-    "road hazard annotation",
+    "hire data entry specialist",
     "hire virtual assistant",
     "remote data annotator",
     "Neural Precision",
@@ -69,9 +72,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "Data Annotation Specialist & Virtual Assistant | Everlyn Linda",
+    title: "Data Annotation, Data Entry & Virtual Assistant | Everlyn Linda",
     description:
-      "Hire Everlyn Linda for accurate data annotation, image segmentation, AI training support, and virtual assistant services. Reliable remote support for growing teams.",
+      "Hire Everlyn Linda for accurate data annotation, data entry, image segmentation, AI training support, and virtual assistant services. Reliable remote support for growing teams.",
     images: [
       {
         url: "/images/everlyn_linda_photo.webp",
@@ -84,9 +87,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Data Annotation Specialist & Virtual Assistant | Everlyn Linda",
+    title: "Data Annotation, Data Entry & Virtual Assistant | Everlyn Linda",
     description:
-      "Hire Everlyn Linda for accurate data annotation, image segmentation, AI training support, and virtual assistant services.",
+      "Hire Everlyn Linda for accurate data annotation, data entry, image segmentation, AI training support, and virtual assistant services.",
     images: ["/images/everlyn_linda_photo.webp"],
     creator: "@everlynlinda",
   },
@@ -104,11 +107,11 @@ export default function RootLayout({
     name: SITE_NAME,
     url: SITE_URL,
     description:
-      "Accurate data annotation, image segmentation, AI training support, and virtual assistant services by Everlyn Linda.",
+      "Accurate data annotation, data entry & management, image segmentation, AI training support, and virtual assistant services by Everlyn Linda.",
     founder: {
       "@type": "Person",
       name: "Everlyn Linda",
-      jobTitle: "Data Annotation Specialist & Virtual Assistant",
+      jobTitle: "Data Annotation Specialist, Data Entry Expert & Virtual Assistant",
       url: SITE_URL,
       address: {
         "@type": "PostalAddress",
@@ -130,11 +133,13 @@ export default function RootLayout({
     },
     serviceType: [
       "Data Annotation",
+      "Data Entry & Management",
       "Image Segmentation",
       "Virtual Assistance",
       "Customer Support",
       "AI Training Support",
-      "Data Entry",
+      "Spreadsheet Management",
+      "Database Management",
     ],
     knowsAbout: [
       "CVAT",

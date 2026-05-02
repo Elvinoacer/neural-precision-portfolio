@@ -4,10 +4,11 @@ import Image from "next/image";
 export default function HeroSection() {
   const trustChips = [
     "Data Annotation",
+    "Data Entry",
     "Image Segmentation",
     "Customer Support",
-    "Data Entry",
-    "Remote VA Support",
+    "Virtual Assistance",
+    "AI Training Support",
   ];
 
   return (
@@ -50,10 +51,10 @@ export default function HeroSection() {
           {/* Headline */}
           <div className="space-y-5 animate-fade-in-up-delay-1">
             <h1 className="font-display text-[2.2rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-[72px] font-medium tracking-tight">
-              Accurate Data Annotation &amp;
+              Data Annotation, Data Entry
               <br />
               <span className="text-gradient-primary font-bold">
-                Reliable Virtual Assistance
+                &amp; Reliable Virtual Assistance
               </span>
               <br />
               <span className="text-on-surface-variant font-light text-[1.6rem] sm:text-3xl md:text-4xl lg:text-5xl">
@@ -65,8 +66,8 @@ export default function HeroSection() {
           {/* Value proposition */}
           <p className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed animate-fade-in-up-delay-2">
             I help AI teams, businesses, and busy professionals handle
-            structured data, image annotation, customer support, and admin
-            operations with precision.
+            data entry, image annotation, customer support, and admin
+            operations — with precision, speed, and zero errors.
           </p>
 
           {/* CTAs */}

@@ -56,12 +56,30 @@ const annotationSamples = [
   },
 ];
 
-const vaSamples = [
+const dataEntrySamples = [
   {
-    title: "Data Entry & Organization",
+    title: "Spreadsheet Data Entry",
     desc: "Structured spreadsheet management, database input, and document formatting with consistent naming conventions and zero-error accuracy.",
     icon: "table_chart",
   },
+  {
+    title: "Product Listing & Catalogs",
+    desc: "E-commerce product data entry — titles, descriptions, pricing, SKUs, and image uploads organized for multi-platform consistency.",
+    icon: "inventory_2",
+  },
+  {
+    title: "Database & CRM Entry",
+    desc: "Contact record creation, lead data entry, CRM field population, and data cleaning across Airtable, HubSpot, and Google Sheets.",
+    icon: "database",
+  },
+  {
+    title: "Invoice & Receipt Processing",
+    desc: "Digitization and organized entry of invoices, receipts, and financial records into spreadsheets or accounting platforms.",
+    icon: "receipt_long",
+  },
+];
+
+const vaSamples = [
   {
     title: "Email Management",
     desc: "Professional email response templates, inbox organization, priority sorting, and follow-up scheduling for busy executives.",
@@ -219,7 +237,7 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* VA Samples */}
+      {/* Data Entry Samples */}
       <section className="w-full py-16 md:py-24 relative bg-surface-dim section-divider">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-10 md:mb-16">
@@ -227,12 +245,12 @@ export default function PortfolioPage() {
               Category 02
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-              Virtual Assistant{" "}
+              Data Entry{" "}
               <span className="font-bold text-gradient-secondary">Samples</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
-            {vaSamples.map((sample) => (
+            {dataEntrySamples.map((sample) => (
               <div
                 key={sample.title}
                 className="glass-panel premium-border rounded-2xl p-6 sm:p-8 group transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
@@ -257,12 +275,50 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* Customer Support Samples */}
+      {/* VA Samples */}
       <section className="w-full py-16 md:py-24 relative bg-surface-container-lowest section-divider">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-10 md:mb-16">
             <span className="font-label-mono text-xs uppercase tracking-widest text-tertiary mb-3 block">
               Category 03
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
+              Virtual Assistant{" "}
+              <span className="font-bold">Samples</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
+            {vaSamples.map((sample) => (
+              <div
+                key={sample.title}
+                className="glass-panel premium-border rounded-2xl p-6 sm:p-8 group transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                <div className="w-11 h-11 rounded-xl glass-pill flex items-center justify-center border border-tertiary/20 mb-5">
+                  <span
+                    className="material-symbols-outlined text-tertiary text-lg"
+                    style={{ fontVariationSettings: "'FILL' 0" }}
+                  >
+                    {sample.icon}
+                  </span>
+                </div>
+                <h3 className="font-display text-lg text-white mb-2 font-medium tracking-tight">
+                  {sample.title}
+                </h3>
+                <p className="font-body-md text-sm text-on-surface-variant leading-relaxed">
+                  {sample.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Customer Support Samples */}
+      <section className="w-full py-16 md:py-24 relative bg-surface-dim section-divider">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
+          <div className="mb-10 md:mb-16">
+            <span className="font-label-mono text-xs uppercase tracking-widest text-primary mb-3 block">
+              Category 04
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
               Customer Support <span className="font-bold">Samples</span>

@@ -10,25 +10,32 @@ export default function ServicesSnapshot() {
       accent: "primary",
     },
     {
+      icon: "table_chart",
+      title: "Data Entry & Management",
+      desc: "Accurate, organized data entry, spreadsheet management, database input, and document formatting with zero-error standards.",
+      href: "/services#data-entry",
+      accent: "secondary",
+    },
+    {
       icon: "person",
       title: "Virtual Assistance",
       desc: "Professional remote assistance for founders, teams, and businesses that need reliable daily execution.",
       href: "/services#virtual-assistant",
-      accent: "secondary",
+      accent: "tertiary",
     },
     {
       icon: "support_agent",
       title: "Customer Support",
       desc: "Friendly, organized, and timely customer communication across email, chat, and support platforms.",
       href: "/services#customer-support",
-      accent: "tertiary",
+      accent: "primary",
     },
     {
       icon: "smart_toy",
       title: "AI / LLM Training",
       desc: "Human-in-the-loop support for improving AI model outputs through evaluation, labeling, and review.",
       href: "/services#ai-training",
-      accent: "primary",
+      accent: "secondary",
     },
   ];
 

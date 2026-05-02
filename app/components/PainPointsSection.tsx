@@ -7,16 +7,22 @@ export default function PainPointsSection() {
       accent: "primary",
     },
     {
+      icon: "table_chart",
+      question: "Drowning in data entry backlogs and messy spreadsheets?",
+      desc: "Unstructured records, missed entries, and formatting errors slow everything down. You need precise, organized data you can trust.",
+      accent: "secondary",
+    },
+    {
       icon: "schedule",
       question: "Overwhelmed by admin tasks eating into your productive hours?",
-      desc: "Data entry, email management, and CRM updates pile up fast. You need someone reliable handling them so you can focus on growth.",
-      accent: "secondary",
+      desc: "Email management, CRM updates, and scheduling pile up fast. You need someone reliable handling them so you can focus on growth.",
+      accent: "tertiary",
     },
     {
       icon: "support_agent",
       question: "Need reliable, responsive customer support for your users?",
       desc: "Your customers deserve timely, professional communication. Slow response times cost you trust and revenue.",
-      accent: "tertiary",
+      accent: "primary",
     },
   ];
 
@@ -29,7 +35,7 @@ export default function PainPointsSection() {
   return (
     <section className="w-full py-16 md:py-24 relative bg-surface-container-lowest section-divider">
       <div className="max-w-[1400px] mx-auto px-5 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {painPoints.map((point) => {
             const colors = accentColors[point.accent];
             return (

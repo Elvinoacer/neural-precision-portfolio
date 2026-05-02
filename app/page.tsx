@@ -9,16 +9,16 @@ import ProofSection from "./components/ProofSection";
 import CTASection from "./components/CTASection";
 
 export const metadata: Metadata = {
-  title: "Hire a Data Annotation Specialist & Virtual Assistant — Everlyn Linda",
+  title: "Hire a Data Annotation & Data Entry Specialist — Everlyn Linda",
   description:
-    "Accurate data annotation and reliable virtual assistance for growing teams. Hire Everlyn Linda for image segmentation, AI training data, customer support, data entry, and remote admin operations. Based in Kenya, available worldwide.",
+    "Accurate data annotation, data entry, and reliable virtual assistance for growing teams. Hire Everlyn Linda for image segmentation, spreadsheet management, AI training data, customer support, and remote admin operations. Based in Kenya, available worldwide.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Hire a Data Annotation Specialist & Virtual Assistant — Everlyn Linda",
+    title: "Hire a Data Annotation & Data Entry Specialist — Everlyn Linda",
     description:
-      "Accurate data annotation and reliable virtual assistance for growing teams. Image segmentation, AI training data, customer support, and remote admin operations.",
+      "Accurate data annotation, data entry, and reliable virtual assistance for growing teams. Image segmentation, spreadsheet management, AI training data, customer support, and remote operations.",
     url: "/",
   },
 };

@@ -79,6 +79,7 @@ export default function ContactForm() {
               <select className="appearance-none bg-transparent border-b border-white/15 px-0 py-3 text-base md:text-lg text-white focus:border-primary transition-colors outline-none w-full cursor-pointer pr-10" id="serviceNeeded" name="serviceNeeded" required defaultValue="">
                 <option disabled value="" className="bg-surface-dim text-muted">Select a service...</option>
                 <option value="data_annotation" className="bg-surface-dim text-white">Data Annotation</option>
+                <option value="data_entry" className="bg-surface-dim text-white">Data Entry & Management</option>
                 <option value="virtual_assistant" className="bg-surface-dim text-white">Virtual Assistant</option>
                 <option value="customer_support" className="bg-surface-dim text-white">Customer Support</option>
                 <option value="ai_llm_training" className="bg-surface-dim text-white">AI / LLM Training Support</option>

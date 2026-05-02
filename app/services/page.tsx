@@ -54,22 +54,41 @@ const services = [
     cta: "Request Data Annotation Support",
   },
   {
+    id: "data-entry",
+    icon: "table_chart",
+    title: "Data Entry & Management",
+    tagline:
+      "Accurate, structured data entry and database management for businesses that need clean records, organized spreadsheets, and zero-error input.",
+    items: [
+      "Spreadsheet data entry & formatting",
+      "Database input & record management",
+      "Document digitization & formatting",
+      "Invoice & receipt processing",
+      "Product listing & catalog management",
+      "Contact list building & cleaning",
+      "Data migration & conversion",
+    ],
+    tools: ["Google Sheets", "Excel", "Airtable", "Google Workspace", "CRM Platforms"],
+    accent: "secondary",
+    cta: "Request Data Entry Support",
+  },
+  {
     id: "virtual-assistant",
     icon: "person",
     title: "Virtual Assistant Services",
     tagline:
       "Professional remote assistance for founders, teams, and businesses that need reliable daily execution.",
     items: [
-      "Data entry & database management",
       "Email management & correspondence",
       "Customer support & communication",
       "Calendar management & scheduling",
       "CRM updates & maintenance",
       "Document organization & formatting",
       "Online research & reporting",
+      "Task coordination & follow-ups",
     ],
     tools: ["Google Workspace", "Trello", "Asana", "ClickUp", "Slack"],
-    accent: "secondary",
+    accent: "tertiary",
     cta: "Hire Me as a Virtual Assistant",
   },
   {
