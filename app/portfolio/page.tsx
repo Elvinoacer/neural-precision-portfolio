@@ -115,6 +115,19 @@ const supportSamples = [
   },
 ];
 
+const portfolioGallery = [
+  {
+    title: "Road Scene Segmentation",
+    image: "/images/portfolios/p1.png",
+    alt: "Annotated road scene with semantic segmentation overlays",
+  },
+  {
+    title: "Vehicle Detection Sample",
+    image: "/images/portfolios/p2.png",
+    alt: "Annotated vehicle scene with bounding boxes and segmentation overlays",
+  },
+];
+
 const tagColorMap: Record<string, string> = {
   primary: "text-primary border-primary/20",
   secondary: "text-secondary border-secondary/20",
@@ -230,6 +243,50 @@ export default function PortfolioPage() {
                       </span>
                     </div>
                   </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio Gallery */}
+      <section className="w-full py-16 md:py-24 relative bg-surface-container-lowest section-divider">
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
+          <div className="mb-10 md:mb-16 flex items-end justify-between gap-6 flex-wrap">
+            <div>
+              <span className="font-label-mono text-xs uppercase tracking-widest text-secondary mb-3 block">
+                Category 01B
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
+                Portfolio <span className="font-bold text-gradient-secondary">Gallery</span>
+              </h2>
+            </div>
+            <p className="font-body-md text-sm sm:text-base text-on-surface-variant max-w-xl leading-relaxed">
+              Two labeled scene examples from the portfolio image set, shown here in the same visual language as the rest of the site.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            {portfolioGallery.map((item) => (
+              <article
+                key={item.title}
+                className="glass-panel premium-border rounded-2xl md:rounded-3xl overflow-hidden group shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+              >
+                <div className="relative h-60 sm:h-75 md:h-90 w-full bg-surface-dim overflow-hidden">
+                  <Image
+                    alt={item.alt}
+                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                    src={item.image}
+                    width={1200}
+                    height={720}
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-surface-container-lowest via-surface-container-lowest/35 to-transparent"></div>
+                </div>
+                <div className="p-6 sm:p-8">
+                  <h3 className="font-display text-xl md:text-2xl text-white tracking-tight font-medium">
+                    {item.title}
+                  </h3>
                 </div>
               </article>
             ))}
