@@ -10,7 +10,8 @@ export const metadata: Metadata = {
     canonical: "/portfolio",
   },
   openGraph: {
-    title: "Work Samples & Portfolio — Data Annotation & Virtual Assistant | Everlyn Linda",
+    title:
+      "Work Samples & Portfolio — Data Annotation & Virtual Assistant | Everlyn Linda",
     description:
       "View Everlyn Linda's portfolio: data annotation projects, image segmentation samples, virtual assistant workflows, and customer support case studies.",
     url: "/portfolio",
@@ -259,11 +260,15 @@ export default function PortfolioPage() {
                 Category 01B
               </span>
               <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-                Portfolio <span className="font-bold text-gradient-secondary">Gallery</span>
+                Portfolio{" "}
+                <span className="font-bold text-gradient-secondary">
+                  Gallery
+                </span>
               </h2>
             </div>
             <p className="font-body-md text-sm sm:text-base text-on-surface-variant max-w-xl leading-relaxed">
-              Two labeled scene examples from the portfolio image set, shown here in the same visual language as the rest of the site.
+              Two labeled scene examples from the portfolio image set, shown
+              here in the same visual language as the rest of the site.
             </p>
           </div>
 
@@ -340,8 +345,7 @@ export default function PortfolioPage() {
               Category 03
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-              Virtual Assistant{" "}
-              <span className="font-bold">Samples</span>
+              Virtual Assistant <span className="font-bold">Samples</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
