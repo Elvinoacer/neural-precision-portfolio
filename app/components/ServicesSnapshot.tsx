@@ -39,15 +39,17 @@ export default function ServicesSnapshot() {
     },
   ];
 
-  const accentMap: Record<string, { border: string; text: string; shadow: string }> = {
-    primary: { border: "border-primary/30", text: "text-primary", shadow: "shadow-[0_0_20px_rgba(0,212,255,0.15)]" },
-    secondary: { border: "border-secondary/30", text: "text-secondary", shadow: "shadow-[0_0_20px_rgba(124,58,237,0.15)]" },
-    tertiary: { border: "border-tertiary/30", text: "text-tertiary", shadow: "shadow-[0_0_20px_rgba(34,197,94,0.15)]" },
+  const accentMap: Record<string, { border: string; text: string; iconBg: string; hoverBorder: string }> = {
+    primary: { border: "border-primary/15", text: "text-primary", iconBg: "bg-primary/10", hoverBorder: "hover:border-primary/30" },
+    secondary: { border: "border-secondary/15", text: "text-secondary", iconBg: "bg-secondary/10", hoverBorder: "hover:border-secondary/30" },
+    tertiary: { border: "border-tertiary/15", text: "text-tertiary", iconBg: "bg-tertiary/10", hoverBorder: "hover:border-tertiary/30" },
   };
 
   return (
-    <section className="py-20 md:py-32 relative z-10 bg-surface-dim section-divider">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+    <section className="py-20 md:py-32 relative z-10 bg-surface-dim section-gradient-top overflow-hidden">
+      {/* Ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[50%] bg-primary/[0.04] rounded-full blur-[150px] pointer-events-none"></div>
+
       <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-10">
         <header className="mb-12 md:mb-20 text-center flex flex-col items-center">
           <span className="font-label-mono text-[11px] tracking-widest uppercase text-primary mb-5 border border-primary/20 px-4 py-2 rounded-full glass-pill">
@@ -61,13 +63,19 @@ export default function ServicesSnapshot() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
-          {services.map((service) => {
+        {/* Bento grid: first two cards larger, last three in a row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5 md:gap-6">
+          {services.map((service, idx) => {
             const colors = accentMap[service.accent];
+            // First two cards span 3 cols each (50/50), last three span 2 cols each (33/33/33)
+            const colSpan = idx < 2 ? "lg:col-span-3" : "lg:col-span-2";
             return (
-              <Link key={service.title} href={service.href} className="glass-panel premium-border rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 flex flex-col gap-5 relative group overflow-hidden transition-all duration-500 hover:-translate-y-1 md:hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(0,0,0,0.4)]">
-                <div className={`absolute inset-0 bg-gradient-to-br from-${service.accent}/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}></div>
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl glass-pill flex items-center justify-center border ${colors.border} ${colors.shadow} shrink-0 relative z-10`}>
+              <Link
+                key={service.title}
+                href={service.href}
+                className={`${colSpan} glass-panel rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 flex flex-col gap-5 relative group overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.35)] border border-white/[0.06] ${colors.hoverBorder} shimmer-sweep`}
+              >
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center border ${colors.border} ${colors.iconBg} shrink-0 relative z-10 transition-all duration-500 group-hover:scale-110`}>
                   <span className={`material-symbols-outlined ${colors.text} text-xl sm:text-2xl`} style={{ fontVariationSettings: "'FILL' 0" }}>
                     {service.icon}
                   </span>
@@ -76,7 +84,7 @@ export default function ServicesSnapshot() {
                 <p className="font-body-lg text-sm sm:text-base text-on-surface-variant relative z-10 leading-relaxed">{service.desc}</p>
                 <span className="font-label-mono text-xs text-primary uppercase tracking-widest relative z-10 mt-auto flex items-center gap-2 group-hover:gap-3 transition-all">
                   Learn More
-                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </span>
               </Link>
             );
