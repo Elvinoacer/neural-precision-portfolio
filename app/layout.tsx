@@ -122,7 +122,7 @@ export default function RootLayout({
       contactPoint: {
         "@type": "ContactPoint",
         telephone: "+254-792-038496",
-        email: "lindahlish18@gmail.com",
+        email: "everlineauma46@gmail.com",
         contactType: "customer service",
         availableLanguage: "English",
       },

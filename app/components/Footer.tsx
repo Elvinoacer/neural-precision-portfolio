@@ -13,7 +13,7 @@ export default function Footer() {
   ];
 
   const contactLinks = [
-    { name: "Email", href: "mailto:lindahlish18@gmail.com" },
+    { name: "Email", href: "mailto:everlineauma46@gmail.com" },
     {
       name: "LinkedIn",
       href: "https://www.linkedin.com/in/lindahlish2043",
