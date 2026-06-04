@@ -1,14 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
-const IMAGES = [
+const BASE_IMAGES = [
   "/images/landingpage_smooth_animations/image1.png",
   "/images/landingpage_smooth_animations/image2.png",
   "/images/landingpage_smooth_animations/image3.png",
 ];
+
+// Duplicate images to create a continuous 12-panel cylinder
+const PANEL_COUNT = 12;
+const IMAGES = Array.from({ length: PANEL_COUNT }, (_, i) => BASE_IMAGES[i % BASE_IMAGES.length]);
 
 const TAGS = [
   { label: "road", color: "#00e6b4", borderColor: "rgba(0,230,180,0.5)" },
@@ -19,61 +23,73 @@ const TAGS = [
   { label: "sidewalk", color: "#34d399", borderColor: "rgba(52,211,153,0.5)" },
 ];
 
-const DURATION = 4500;
-
-/**
- * Full-screen background segmentation slideshow with HUD overlays.
- * Designed to sit at z-0 behind all hero text content.
- */
 export default function SegmentationHeroVisual() {
-  const [current, setCurrent] = useState(0);
   const [conf, setConf] = useState(98.7);
   const [segCount, setSegCount] = useState(12);
+  const [frame, setFrame] = useState(1);
 
-  const advance = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % IMAGES.length);
-    setConf(96 + Math.random() * 3.5);
-    setSegCount(Math.floor(8 + Math.random() * 10));
+  // Update HUD readout continuously
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setConf(95 + Math.random() * 4.5);
+      setSegCount(Math.floor(10 + Math.random() * 15));
+      setFrame((prev) => prev + 1);
+    }, 1500);
+    return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(advance, DURATION);
-    return () => clearInterval(timer);
-  }, [advance]);
-
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
-      {/* ──── Image Slides ──── */}
-      <AnimatePresence mode="popLayout">
+    <div className="absolute inset-0 z-0 overflow-hidden bg-black flex items-center justify-center">
+      {/* ──── 3D Cylinder Scene ──── */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center" 
+        style={{ perspective: "1200px" }}
+      >
         <motion.div
-          key={current}
-          initial={{ opacity: 0, scale: 1.15 }}
-          animate={{ opacity: 0.45, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{
-            opacity: { duration: 1.8, ease: "easeInOut" },
-            scale: { duration: 12, ease: "linear" },
-          }}
-          className="absolute inset-0 w-full h-full"
+          className="relative w-[320px] h-[220px] md:w-[450px] md:h-[280px]"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={{ rotateY: [0, -360] }}
+          transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
         >
-          <Image
-            src={IMAGES[current]}
-            alt={`Segmentation scene ${current + 1}`}
-            fill
-            className="object-cover"
-            priority={current === 0}
-            quality={85}
-            sizes="100vw"
-          />
-        </motion.div>
-      </AnimatePresence>
+          {IMAGES.map((src, i) => {
+            const angle = (360 / PANEL_COUNT) * i;
+            // Create a wavy helix offset using a sine wave so it loops seamlessly
+            const yOffset = Math.sin((i / PANEL_COUNT) * Math.PI * 2) * 120;
+            // Push panels outward to form the cylinder radius
+            const translateZ = "min(85vw, 800px)"; 
 
-      {/* ──── Dark Gradient Overlay (readability) ──── */}
+            return (
+              <div
+                key={i}
+                className="absolute inset-0 premium-border rounded-xl md:rounded-2xl overflow-hidden glass-panel"
+                style={{
+                  transform: `rotateY(${angle}deg) translateZ(${translateZ}) translateY(${yOffset}px)`,
+                  backfaceVisibility: "hidden", // Hide panels on the back of the cylinder to prevent visual clutter
+                  opacity: 0.85,
+                }}
+              >
+                <Image
+                  src={src}
+                  alt={`Segmentation panel ${i + 1}`}
+                  fill
+                  className="object-cover opacity-80 mix-blend-screen"
+                  quality={75}
+                  sizes="(max-width: 768px) 320px, 450px"
+                />
+                {/* Panel specific glowing scanline or overlay can go here if needed */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none" />
+              </div>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      {/* ──── Dark Gradient Overlay (readability for text on top) ──── */}
       <div
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.55) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.7) 100%)",
         }}
       />
 
@@ -91,7 +107,7 @@ export default function SegmentationHeroVisual() {
       {/* ──── Dual Scanlines ──── */}
       <div className="sh-overlay-scan" style={{ zIndex: 4 }}>
         <div className="sh-scanline" />
-        <div className="sh-scanline" style={{ animationDelay: "1.5s" }} />
+        <div className="sh-scanline" style={{ animationDelay: "2s" }} />
       </div>
 
       {/* ──── HUD Corners ──── */}
@@ -113,7 +129,7 @@ export default function SegmentationHeroVisual() {
       {TAGS.map((tag, i) => (
         <span
           key={tag.label}
-          className="sh-tag"
+          className="sh-tag hidden md:block"
           style={{
             color: tag.color,
             borderColor: tag.borderColor,
@@ -138,7 +154,7 @@ export default function SegmentationHeroVisual() {
       {/* ──── Bottom-right Segmentation Info Panel ──── */}
       <div className="sh-seg-info" style={{ zIndex: 6 }}>
         <span>SEMANTIC SEG</span>
-        <span>FRAME {String(current + 1).padStart(3, "0")}</span>
+        <span>FRAME {String(frame).padStart(4, "0")}</span>
         <span>CONF {conf.toFixed(1)}%</span>
         <span>SEGMENTS {segCount}</span>
       </div>
@@ -159,26 +175,6 @@ export default function SegmentationHeroVisual() {
         <span className="block" style={{ animation: "sh-infoBlink 2s ease-in-out infinite alternate 0.3s" }}>
           RES: 1024×512
         </span>
-      </div>
-
-      {/* ──── Progress Dots ──── */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-[6]">
-        {IMAGES.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => {
-              setCurrent(idx);
-              setConf(96 + Math.random() * 3.5);
-              setSegCount(Math.floor(8 + Math.random() * 10));
-            }}
-            aria-label={`Go to segmentation slide ${idx + 1}`}
-            className={`w-[6px] h-[6px] rounded-full border transition-all duration-400 cursor-pointer ${
-              idx === current
-                ? "bg-[rgba(0,230,180,0.9)] scale-150 border-[rgba(0,230,180,0.8)] shadow-[0_0_6px_rgba(0,230,180,0.6)]"
-                : "bg-white/30 border-white/40 hover:bg-white/50"
-            }`}
-          />
-        ))}
       </div>
     </div>
   );
