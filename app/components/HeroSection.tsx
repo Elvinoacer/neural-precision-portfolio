@@ -3,47 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useMotionValue } from "framer-motion";
-import AnimatedSegmentationCard from "./AnimatedSegmentationCard";
-
-/** Segmentation image configurations */
-const IMAGES = [
-  {
-    src: "/images/landingpage_smooth_animations/image1.png",
-    alt: "2D semantic segmentation — urban scene with annotated road, vehicles, trees, and buildings",
-    width: 1000,
-    height: 630,
-    displayClass: "w-[280px] sm:w-[320px] lg:w-[400px] xl:w-[450px]",
-    positionClass: "lg:top-[0%] lg:right-[10%] xl:top-[5%] xl:right-[15%]",
-    orbit: { x: [0, 20, -10, 0], y: [0, -15, 10, 0], duration: 25 },
-    delay: 0.2,
-    parallaxFactor: 30,
-    preload: true,
-  },
-  {
-    src: "/images/landingpage_smooth_animations/image2.png",
-    alt: "2D image segmentation — street scene with color-coded road surfaces, vehicles, and sidewalks",
-    width: 1000,
-    height: 630,
-    displayClass: "w-[240px] sm:w-[280px] lg:w-[320px] xl:w-[360px]",
-    positionClass: "lg:top-[35%] lg:-right-[10%] xl:top-[40%] xl:-right-[5%]",
-    orbit: { x: [0, -15, 20, 0], y: [0, 15, -20, 0], duration: 30 },
-    delay: 0.4,
-    parallaxFactor: 20,
-    preload: false,
-  },
-  {
-    src: "/images/landingpage_smooth_animations/image3.png",
-    alt: "2D image segmentation — highway scene with segmented guardrails, terrain, and sky regions",
-    width: 1152,
-    height: 648,
-    displayClass: "w-[260px] sm:w-[300px] lg:w-[380px] xl:w-[420px]",
-    positionClass: "lg:bottom-[5%] lg:left-[-5%] xl:bottom-[10%] xl:left-[0%]",
-    orbit: { x: [0, 20, -15, 0], y: [0, -10, 20, 0], duration: 22 },
-    delay: 0.6,
-    parallaxFactor: 25,
-    preload: false,
-  },
-];
+import SegmentationHeroVisual from "./SegmentationHeroVisual";
 
 const stats = [
   { value: "500+", label: "Tasks Delivered" },
@@ -223,56 +183,8 @@ export default function HeroSection() {
         </div>
 
         {/* ──── Right: Floating Segmentation Images ──── */}
-        <div className="w-full lg:w-[50%] xl:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:h-[700px] flex flex-col lg:block items-center justify-center gap-6 mt-8 lg:mt-0 z-0">
-          {/* Desktop: Floating Images (Absolute positioning) */}
-          <div className="hidden lg:block absolute inset-0">
-            {IMAGES.map((img) => (
-              <AnimatedSegmentationCard
-                key={img.src}
-                src={img.src}
-                alt={img.alt}
-                width={img.width}
-                height={img.height}
-                orbitConfig={img.orbit}
-                delay={img.delay}
-                mouseX={mouseX}
-                mouseY={mouseY}
-                parallaxFactor={img.parallaxFactor}
-                preload={img.preload}
-                className={`${img.displayClass} ${img.positionClass}`}
-              />
-            ))}
-          </div>
-
-          {/* Mobile/Tablet: Stacked Images (Flex layout) */}
-          <div className="lg:hidden flex flex-col sm:flex-row flex-wrap justify-center items-center gap-6 w-full">
-            {IMAGES.map((img, i) => (
-              <motion.div
-                key={img.src}
-                className={`glass-image-card ${img.displayClass} relative`}
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{
-                  opacity: 1,
-                  scale: [1, 1.03, 1],
-                  y: [0, -8, 0],
-                }}
-                transition={{
-                  opacity: { duration: 0.6, delay: img.delay },
-                  scale: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 },
-                  y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: i * 0.7 },
-                }}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  width={img.width}
-                  height={img.height}
-                  className="w-full h-auto object-cover"
-                  loading={i === 0 ? "eager" : "lazy"}
-                />
-              </motion.div>
-            ))}
-          </div>
+        <div className="w-full lg:w-[50%] xl:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:h-[700px] flex items-center justify-center gap-6 mt-8 lg:mt-0 z-0">
+          <SegmentationHeroVisual />
         </div>
       </div>
 

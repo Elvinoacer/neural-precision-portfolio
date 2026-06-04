@@ -1,0 +1,365 @@
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; }
+
+  .hero {
+    width: 100%;
+    height: 520px;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    border-radius: 16px;
+  }
+
+  .track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    opacity: 0;
+    transform: scale(1.08) rotate(1deg);
+    transition: opacity 0s, transform 0s;
+    will-change: transform, opacity;
+  }
+
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    transition: opacity 1.2s ease, transform 8s linear;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: scale(0.92) rotate(-1.5deg);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+  }
+
+  /* Overlay effects */
+  .overlay-scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0,255,180,0.6) 30%, rgba(0,220,255,0.9) 50%, rgba(0,255,180,0.6) 70%, transparent 100%);
+    animation: scanDown 3s linear infinite;
+    border-radius: 2px;
+    filter: blur(1px);
+  }
+
+  @keyframes scanDown {
+    0%   { top: -3px; opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Corner HUD brackets */
+  .hud {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .corner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: rgba(0, 230, 180, 0.8);
+    border-style: solid;
+    border-width: 0;
+    animation: cornerPulse 2s ease-in-out infinite alternate;
+  }
+
+  .corner.tl { top: 16px; left: 16px; border-top-width: 2.5px; border-left-width: 2.5px; border-radius: 4px 0 0 0; }
+  .corner.tr { top: 16px; right: 16px; border-top-width: 2.5px; border-right-width: 2.5px; border-radius: 0 4px 0 0; }
+  .corner.bl { bottom: 16px; left: 16px; border-bottom-width: 2.5px; border-left-width: 2.5px; border-radius: 0 0 0 4px; }
+  .corner.br { bottom: 16px; right: 16px; border-bottom-width: 2.5px; border-right-width: 2.5px; border-radius: 0 0 4px 0; }
+
+  @keyframes cornerPulse {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+  }
+
+  /* Spinning ring */
+  .ring-wrap {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    pointer-events: none;
+    animation: ringFade 4s ease-in-out infinite;
+  }
+
+  @keyframes ringFade {
+    0%,100% { opacity: 0; }
+    20%,80%  { opacity: 1; }
+  }
+
+  .ring {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(0,230,180,0.9);
+    border-right-color: rgba(0,180,255,0.6);
+    border-bottom-color: rgba(0,230,180,0.3);
+    animation: spin 2s linear infinite;
+  }
+
+  .ring2 {
+    position: absolute;
+    top: 10px; left: 10px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(255,180,0,0.5);
+    border-left-color: rgba(255,80,120,0.5);
+    animation: spinReverse 3s linear infinite;
+  }
+
+  .ring-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(0,230,180,0.9);
+    animation: dotPulse 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes spinReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+  @keyframes dotPulse {
+    from { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 6px rgba(0,230,180,0.6); }
+    to   { transform: translate(-50%,-50%) scale(1.5); box-shadow: 0 0 14px rgba(0,230,180,0.9); }
+  }
+
+  /* Floating label tags */
+  .tag {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #00e6b4;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(0,230,180,0.5);
+    border-radius: 4px;
+    padding: 3px 8px;
+    z-index: 5;
+    pointer-events: none;
+    animation: tagFloat 6s ease-in-out infinite;
+  }
+
+  .tag:nth-child(1) { top: 14%; left: 5%; animation-delay: 0s; }
+  .tag:nth-child(2) { top: 14%; right: 5%; animation-delay: 1s; color: #ffb400; border-color: rgba(255,180,0,0.5); }
+  .tag:nth-child(3) { bottom: 14%; left: 5%; animation-delay: 2s; color: #00b4ff; border-color: rgba(0,180,255,0.5); }
+  .tag:nth-child(4) { bottom: 14%; right: 5%; animation-delay: 3s; color: #ff507a; border-color: rgba(255,80,122,0.5); }
+
+  @keyframes tagFloat {
+    0%,100% { transform: translateY(0); opacity: 0.7; }
+    50%      { transform: translateY(-6px); opacity: 1; }
+  }
+
+  /* Progress dots */
+  .dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 6;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    border: 1px solid rgba(255,255,255,0.4);
+    transition: background 0.4s, transform 0.4s;
+    cursor: pointer;
+  }
+
+  .dot.on {
+    background: rgba(0,230,180,0.9);
+    transform: scale(1.4);
+    border-color: rgba(0,230,180,0.8);
+  }
+
+  /* Segment count overlay */
+  .seg-info {
+    position: absolute;
+    bottom: 48px;
+    right: 20px;
+    z-index: 5;
+    pointer-events: none;
+    text-align: right;
+  }
+
+  .seg-info span {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: rgba(0,230,180,0.7);
+    letter-spacing: 0.1em;
+    animation: infoBlink 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes infoBlink {
+    from { opacity: 0.5; }
+    to   { opacity: 1; }
+  }
+
+  /* Vignette */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Animated color bars */
+  .colorbar {
+    position: absolute;
+    left: 0; right: 0;
+    height: 3px;
+    z-index: 3;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .colorbar.top { top: 0; }
+  .colorbar.bottom { bottom: 0; }
+
+  .colorbar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #00e6b4, #00b4ff, #ffb400, #ff507a, #00e6b4);
+    background-size: 200% 100%;
+    animation: barSlide 3s linear infinite;
+  }
+
+  @keyframes barSlide {
+    from { background-position: 0% center; }
+    to   { background-position: 200% center; }
+  }
+</style>
+
+<div class="hero">
+  <div id="slides" class="track"></div>
+
+  <div class="vignette"></div>
+
+  <div class="colorbar top"><div class="colorbar-inner"></div></div>
+  <div class="colorbar bottom"><div class="colorbar-inner"></div></div>
+
+  <div class="overlay-scan">
+    <div class="scanline"></div>
+  </div>
+
+  <div class="hud">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+  </div>
+
+  <div class="ring-wrap">
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <div class="ring-dot"></div>
+  </div>
+
+  <div class="tag">road</div>
+  <div class="tag">sky</div>
+  <div class="tag">vehicle</div>
+  <div class="tag">terrain</div>
+
+  <div class="seg-info">
+    <span id="seg-label">SEMANTIC SEG</span>
+    <span id="seg-frame">FRAME 001</span>
+    <span id="seg-conf">CONF 98.7%</span>
+  </div>
+
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+const imgPaths = [
+  "/mnt/user-data/uploads/1780599301608_image.png",
+  "/mnt/user-data/uploads/1780599312185_image.png",
+  "/mnt/user-data/uploads/1780599322555_image.png"
+];
+
+const DURATION = 3500;
+const slidesEl = document.getElementById('slides');
+const dotsEl = document.getElementById('dots');
+const segFrame = document.getElementById('seg-frame');
+const segConf = document.getElementById('seg-conf');
+
+let current = 0;
+let slideEls = [];
+
+imgPaths.forEach((src, i) => {
+  const div = document.createElement('div');
+  div.className = 'slide';
+  const img = document.createElement('img');
+  img.src = src;
+  div.appendChild(img);
+  slidesEl.appendChild(div);
+  slideEls.push(div);
+
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' on' : '');
+  dot.onclick = () => goTo(i);
+  dotsEl.appendChild(dot);
+});
+
+function goTo(idx) {
+  slideEls[current].classList.remove('active');
+  slideEls[current].classList.add('exit');
+  setTimeout(() => {
+    slideEls[current].classList.remove('exit');
+  }, 1500);
+
+  document.querySelectorAll('.dot')[current].classList.remove('on');
+  current = idx;
+  slideEls[current].classList.add('active');
+  document.querySelectorAll('.dot')[current].classList.on;
+  document.querySelectorAll('.dot')[current].classList.add('on');
+
+  segFrame.textContent = `FRAME ${String(idx + 1).padStart(3,'0')}`;
+  segConf.textContent = `CONF ${(96 + Math.random()*3.5).toFixed(1)}%`;
+}
+
+slideEls[0].classList.add('active');
+
+setInterval(() => {
+  goTo((current + 1) % imgPaths.length);
+}, DURATION);
+</script>
