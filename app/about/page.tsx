@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     canonical: "/about",
   },
   openGraph: {
-    title: "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
+    title:
+      "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
     description:
       "Meet Everlyn Linda — a detail-oriented data annotation specialist and virtual assistant based in Kenya, helping teams work smarter with accurate data and reliable support.",
     url: "/about",
@@ -27,7 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
+    title:
+      "About Everlyn Linda — Data Annotation Specialist & Virtual Assistant",
     description:
       "150+ projects, 5000+ annotation hours. Detail-oriented data annotation specialist & virtual assistant based in Kenya.",
   },
@@ -147,38 +149,49 @@ export default function AboutPage() {
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4 md:gap-6 pt-4 md:pt-8">
-                <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-primary/50">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
-                    150<span className="text-primary">+</span>
-                  </span>
-                  <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
-                    Projects
-                  </span>
-                </div>
-                <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-secondary/50">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
-                    5k<span className="text-secondary">+</span>
-                  </span>
-                  <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
-                    Annotation Hours
-                  </span>
-                </div>
-                <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-tertiary/50">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
-                    40<span className="text-tertiary">+</span>
-                  </span>
-                  <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
-                    Clients
-                  </span>
-                </div>
-                <div className="glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 border-l-white/30">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
-                    12
-                  </span>
-                  <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
-                    Tools Mastered
-                  </span>
-                </div>
+                {[
+                  {
+                    value: "150",
+                    suffix: "+",
+                    label: "Projects",
+                    accentClass: "text-primary",
+                    borderClass: "border-l-primary/50",
+                  },
+                  {
+                    value: "5k",
+                    suffix: "+",
+                    label: "Annotation Hours",
+                    accentClass: "text-secondary",
+                    borderClass: "border-l-secondary/50",
+                  },
+                  {
+                    value: "40",
+                    suffix: "+",
+                    label: "Clients Served",
+                    accentClass: "text-tertiary",
+                    borderClass: "border-l-tertiary/50",
+                  },
+                  {
+                    value: "99.8",
+                    suffix: "%",
+                    label: "Accuracy Rate",
+                    accentClass: "text-primary",
+                    borderClass: "border-l-primary/50",
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className={`glass-panel p-5 sm:p-6 md:p-8 rounded-2xl flex flex-col justify-center border-l-2 ${stat.borderClass}`}
+                  >
+                    <span className="font-display text-3xl sm:text-4xl md:text-5xl font-light text-white mb-1">
+                      {stat.value}
+                      <span className={stat.accentClass}>{stat.suffix}</span>
+                    </span>
+                    <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
               </div>
 
               <Link

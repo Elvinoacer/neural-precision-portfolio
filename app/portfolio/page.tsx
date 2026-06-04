@@ -299,12 +299,218 @@ export default function PortfolioPage() {
         </div>
       </section>
 
+      {/* AI Dataset Cleaning Sample */}
+      <section
+        id="ai-dataset-cleaning"
+        className="w-full py-16 md:py-24 relative bg-surface-dim section-divider"
+      >
+        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
+          {/* Section Header */}
+          <div className="mb-10 md:mb-16">
+            <span className="font-label-mono text-xs uppercase tracking-widest text-primary mb-3 block">
+              Category 02
+            </span>
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
+              AI Dataset{" "}
+              <span className="font-bold text-gradient-primary">
+                Cleaning Sample
+              </span>
+            </h2>
+            <p className="font-body-lg text-sm sm:text-base text-on-surface-variant max-w-2xl leading-relaxed mt-4">
+              Real deliverable: raw AI evaluation dataset received from a
+              client, cleaned, standardised, and returned with a full QA report.
+            </p>
+          </div>
+
+          {/* QA Metrics Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 mb-10 md:mb-14">
+            {[
+              {
+                value: "11",
+                label: "Records Received",
+                accent: "text-on-surface-variant",
+              },
+              {
+                value: "10",
+                label: "Clean Records Delivered",
+                accent: "text-primary",
+              },
+              {
+                value: "7",
+                label: "Error Types Resolved",
+                accent: "text-secondary",
+              },
+              {
+                value: "99.8%",
+                label: "Accuracy Rate",
+                accent: "text-tertiary",
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="glass-panel premium-border rounded-2xl p-5 sm:p-6 flex flex-col justify-center"
+              >
+                <span className="font-display text-2xl sm:text-3xl md:text-4xl font-light text-white mb-1">
+                  <span className={stat.accent}>{stat.value}</span>
+                </span>
+                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Before / After Table */}
+          <div className="glass-panel premium-border rounded-2xl md:rounded-3xl overflow-hidden mb-8 md:mb-12">
+            <div className="p-6 sm:p-8 border-b border-white/5">
+              <span className="font-label-mono text-[10px] tracking-widest uppercase text-muted">
+                Sample Record — Before &amp; After
+              </span>
+              <h3 className="font-display text-lg sm:text-xl text-white mt-2 font-medium tracking-tight">
+                Task ID T-002 Transformation
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5">
+              {/* Before */}
+              <div className="p-6 sm:p-8">
+                <span className="font-label-mono text-[10px] uppercase tracking-widest text-red-400/80 mb-4 block">
+                  ✗ Before (Raw)
+                </span>
+                <div className="space-y-3">
+                  {[
+                    ["Annotator", "john m", true],
+                    ["Label", "Pedestrian", true],
+                    ["Review Status", "approved", true],
+                    ["Date Submitted", "01/04/2026", true],
+                    ["Confidence", "0.85", false],
+                  ].map(([field, value, isError]) => (
+                    <div
+                      key={field as string}
+                      className="flex justify-between items-center text-sm gap-4"
+                    >
+                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-32 shrink-0">
+                        {field}
+                      </span>
+                      <span
+                        className={`font-body-md ${isError ? "text-red-400/80 line-through" : "text-on-surface-variant"}`}
+                      >
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* After */}
+              <div className="p-6 sm:p-8 bg-primary/[0.02]">
+                <span className="font-label-mono text-[10px] uppercase tracking-widest text-primary mb-4 block">
+                  ✓ After (Cleaned)
+                </span>
+                <div className="space-y-3">
+                  {[
+                    ["Annotator", "John M.", true],
+                    ["Label", "pedestrian", true],
+                    ["Review Status", "Approved", true],
+                    ["Date Submitted", "2026-04-01", true],
+                    ["Confidence", "0.85", false],
+                  ].map(([field, value, wasFixed]) => (
+                    <div
+                      key={field as string}
+                      className="flex justify-between items-center text-sm gap-4"
+                    >
+                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-32 shrink-0">
+                        {field}
+                      </span>
+                      <span
+                        className={`font-body-md ${wasFixed ? "text-primary" : "text-on-surface-variant"}`}
+                      >
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Error Type Breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            {[
+              {
+                type: "Duplicate Row",
+                count: 1,
+                action: "Removed — kept first occurrence",
+                icon: "content_copy",
+              },
+              {
+                type: "Label Casing",
+                count: 4,
+                action: "Standardised to lowercase",
+                icon: "text_fields",
+              },
+              {
+                type: "Date Format",
+                count: 2,
+                action: "Converted to ISO 8601",
+                icon: "calendar_month",
+              },
+              {
+                type: "Missing Annotator",
+                count: 1,
+                action: "Marked UNASSIGNED for review",
+                icon: "person_off",
+              },
+              {
+                type: "Invalid Confidence",
+                count: 1,
+                action: "Flagged for client review",
+                icon: "warning",
+              },
+              {
+                type: "Missing Confidence",
+                count: 1,
+                action: "Marked N/A — cannot be imputed",
+                icon: "indeterminate_check_box",
+              },
+            ].map((err) => (
+              <div
+                key={err.type}
+                className="glass-panel premium-border rounded-xl p-5 group hover:-translate-y-0.5 transition-transform duration-300"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <span
+                    className="material-symbols-outlined text-secondary text-base"
+                    style={{ fontVariationSettings: "'FILL' 0" }}
+                  >
+                    {err.icon}
+                  </span>
+                  <span className="font-display text-sm text-white font-medium">
+                    {err.type}
+                  </span>
+                  <span className="ml-auto font-label-mono text-[10px] text-muted border border-white/10 px-2 py-0.5 rounded-full">
+                    ×{err.count}
+                  </span>
+                </div>
+                <p className="font-body-md text-xs text-on-surface-variant leading-relaxed">
+                  {err.action}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-muted mt-8 text-center flex items-center justify-center gap-3">
+            <span className="w-6 h-[1px] bg-white/15"></span>
+            Full dataset and QA report available upon request
+            <span className="w-6 h-[1px] bg-white/15"></span>
+          </p>
+        </div>
+      </section>
+
       {/* Data Entry Samples */}
       <section className="w-full py-16 md:py-24 relative bg-surface-dim section-divider">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-10 md:mb-16">
             <span className="font-label-mono text-xs uppercase tracking-widest text-secondary mb-3 block">
-              Category 02
+              Category 03
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
               Data Entry{" "}
@@ -342,7 +548,7 @@ export default function PortfolioPage() {
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-10 md:mb-16">
             <span className="font-label-mono text-xs uppercase tracking-widest text-tertiary mb-3 block">
-              Category 03
+              Category 04
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
               Virtual Assistant <span className="font-bold">Samples</span>
@@ -379,7 +585,7 @@ export default function PortfolioPage() {
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           <div className="mb-10 md:mb-16">
             <span className="font-label-mono text-xs uppercase tracking-widest text-primary mb-3 block">
-              Category 04
+              Category 05
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
               Customer Support <span className="font-bold">Samples</span>

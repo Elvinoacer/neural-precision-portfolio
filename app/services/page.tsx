@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     canonical: "/services",
   },
   openGraph: {
-    title: "Services — Data Annotation, Virtual Assistance & AI Training | Everlyn Linda",
+    title:
+      "Services — Data Annotation, Virtual Assistance & AI Training | Everlyn Linda",
     description:
       "Professional data annotation, image segmentation, virtual assistant, customer support, and AI training services. Detailed service breakdowns and capabilities.",
     url: "/services",
@@ -33,7 +34,17 @@ export const metadata: Metadata = {
   },
 };
 
-const services = [
+const services: {
+  id: string;
+  icon: string;
+  title: string;
+  tagline: string;
+  items: string[];
+  tools: string[];
+  accent: string;
+  cta: string;
+  sampleLink?: { href: string; label: string };
+}[] = [
   {
     id: "data-annotation",
     icon: "dataset",
@@ -68,7 +79,13 @@ const services = [
       "Contact list building & cleaning",
       "Data migration & conversion",
     ],
-    tools: ["Google Sheets", "Excel", "Airtable", "Google Workspace", "CRM Platforms"],
+    tools: [
+      "Google Sheets",
+      "Excel",
+      "Airtable",
+      "Google Workspace",
+      "CRM Platforms",
+    ],
     accent: "secondary",
     cta: "Request Data Entry Support",
   },
@@ -115,15 +132,27 @@ const services = [
     tagline:
       "Human-in-the-loop support for improving AI model outputs through careful evaluation, labeling, and content review.",
     items: [
+      "AI model evaluation dataset cleaning",
+      "Confidence score validation",
+      "Label standardisation & error flagging",
       "Response rating & quality scoring",
       "Prompt evaluation & testing",
       "Data cleaning & preprocessing",
       "Content categorization & tagging",
       "Model feedback tasks & RLHF",
     ],
-    tools: ["AI training platforms", "Evaluation frameworks", "ChatGPT"],
+    tools: [
+      "AI training platforms",
+      "Evaluation frameworks",
+      "ChatGPT",
+      "Google Sheets / Excel",
+    ],
     accent: "primary",
     cta: "Discuss AI Training Support",
+    sampleLink: {
+      href: "/portfolio#ai-dataset-cleaning",
+      label: "View Dataset Cleaning Sample",
+    },
   },
 ];
 
@@ -224,6 +253,20 @@ export default function ServicesPage() {
                       arrow_forward
                     </span>
                   </Link>
+                  {service.sampleLink && (
+                    <Link
+                      href={service.sampleLink.href}
+                      className="mt-4 inline-flex items-center gap-2 font-label-mono text-[10px] sm:text-xs uppercase tracking-widest text-primary/70 hover:text-primary transition-colors duration-300"
+                    >
+                      <span
+                        className="material-symbols-outlined text-sm"
+                        style={{ fontVariationSettings: "'FILL' 0" }}
+                      >
+                        open_in_new
+                      </span>
+                      {service.sampleLink.label}
+                    </Link>
+                  )}
                 </div>
 
                 <div className="lg:col-span-7">
