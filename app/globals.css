@@ -359,23 +359,9 @@
   animation: gradient-shift 8s ease infinite;
 }
 
-/* ──── Segmentation Hero Animation Styles ──── */
-.sh-hero {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #000;
-  border-radius: 16px;
-  min-height: 400px;
-}
+/* ──── Segmentation Hero Background Animation ──── */
 
-@media (min-width: 1024px) {
-  .sh-hero {
-    min-height: 520px;
-  }
-}
-
+/* Scanline overlay */
 .sh-overlay-scan {
   position: absolute;
   inset: 0;
@@ -387,20 +373,22 @@
 .sh-scanline {
   position: absolute;
   left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent 0%, rgba(0,255,180,0.6) 30%, rgba(0,220,255,0.9) 50%, rgba(0,255,180,0.6) 70%, transparent 100%);
-  animation: sh-scanDown 3s linear infinite;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,255,180,0.5) 20%, rgba(0,220,255,0.8) 50%, rgba(0,255,180,0.5) 80%, transparent 100%);
+  animation: sh-scanDown 4s linear infinite;
   border-radius: 2px;
-  filter: blur(1px);
+  filter: blur(0.5px);
+  box-shadow: 0 0 12px rgba(0,230,180,0.3);
 }
 
 @keyframes sh-scanDown {
   0%   { top: -3px; opacity: 0; }
-  5%   { opacity: 1; }
-  95%  { opacity: 1; }
+  5%   { opacity: 0.8; }
+  95%  { opacity: 0.8; }
   100% { top: 100%; opacity: 0; }
 }
 
+/* HUD corners */
 .sh-hud {
   position: absolute;
   inset: 0;
@@ -410,108 +398,107 @@
 
 .sh-corner {
   position: absolute;
-  width: 40px;
-  height: 40px;
-  border-color: rgba(0, 230, 180, 0.8);
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 230, 180, 0.7);
   border-style: solid;
   border-width: 0;
-  animation: sh-cornerPulse 2s ease-in-out infinite alternate;
+  animation: sh-cornerPulse 2.5s ease-in-out infinite alternate;
 }
 
-.sh-corner.tl { top: 16px; left: 16px; border-top-width: 2.5px; border-left-width: 2.5px; border-radius: 4px 0 0 0; }
-.sh-corner.tr { top: 16px; right: 16px; border-top-width: 2.5px; border-right-width: 2.5px; border-radius: 0 4px 0 0; }
-.sh-corner.bl { bottom: 16px; left: 16px; border-bottom-width: 2.5px; border-left-width: 2.5px; border-radius: 0 0 0 4px; }
-.sh-corner.br { bottom: 16px; right: 16px; border-bottom-width: 2.5px; border-right-width: 2.5px; border-radius: 0 0 4px 0; }
+.sh-corner.tl { top: 20px; left: 20px; border-top-width: 2px; border-left-width: 2px; border-radius: 6px 0 0 0; }
+.sh-corner.tr { top: 20px; right: 20px; border-top-width: 2px; border-right-width: 2px; border-radius: 0 6px 0 0; }
+.sh-corner.bl { bottom: 20px; left: 20px; border-bottom-width: 2px; border-left-width: 2px; border-radius: 0 0 0 6px; }
+.sh-corner.br { bottom: 20px; right: 20px; border-bottom-width: 2px; border-right-width: 2px; border-radius: 0 0 6px 0; }
 
 @keyframes sh-cornerPulse {
-  from { opacity: 0.5; }
-  to   { opacity: 1; }
+  from { opacity: 0.4; }
+  to   { opacity: 0.9; }
 }
 
+/* Spinning ring cluster */
 .sh-ring-wrap {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   z-index: 4;
   pointer-events: none;
-  animation: sh-ringFade 4s ease-in-out infinite;
+  animation: sh-ringFade 5s ease-in-out infinite;
 }
 
 @keyframes sh-ringFade {
   0%,100% { opacity: 0; }
-  20%,80%  { opacity: 1; }
+  25%,75%  { opacity: 0.6; }
 }
 
 .sh-ring {
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: rgba(0,230,180,0.9);
-  border-right-color: rgba(0,180,255,0.6);
-  border-bottom-color: rgba(0,230,180,0.3);
-  animation: sh-spin 2s linear infinite;
+  border: 1.5px solid transparent;
+  border-top-color: rgba(0,230,180,0.7);
+  border-right-color: rgba(0,180,255,0.4);
+  border-bottom-color: rgba(0,230,180,0.2);
+  animation: sh-spin 3s linear infinite;
 }
 
 .sh-ring2 {
   position: absolute;
-  top: 10px; left: 10px;
-  width: 140px; height: 140px;
+  top: 15px; left: 15px;
+  width: 170px; height: 170px;
   border-radius: 50%;
-  border: 1.5px solid transparent;
-  border-top-color: rgba(255,180,0,0.5);
-  border-left-color: rgba(255,80,120,0.5);
-  animation: sh-spinReverse 3s linear infinite;
+  border: 1px solid transparent;
+  border-top-color: rgba(255,180,0,0.4);
+  border-left-color: rgba(255,80,120,0.3);
+  animation: sh-spinReverse 4s linear infinite;
 }
 
 .sh-ring-dot {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: 8px; height: 8px;
+  width: 6px; height: 6px;
   border-radius: 50%;
-  background: rgba(0,230,180,0.9);
-  animation: sh-dotPulse 1s ease-in-out infinite alternate;
+  background: rgba(0,230,180,0.8);
+  animation: sh-dotPulse 1.2s ease-in-out infinite alternate;
 }
 
 @keyframes sh-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes sh-spinReverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
 @keyframes sh-dotPulse {
-  from { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 6px rgba(0,230,180,0.6); }
-  to   { transform: translate(-50%,-50%) scale(1.5); box-shadow: 0 0 14px rgba(0,230,180,0.9); }
+  from { transform: translate(-50%,-50%) scale(1); box-shadow: 0 0 4px rgba(0,230,180,0.5); }
+  to   { transform: translate(-50%,-50%) scale(1.8); box-shadow: 0 0 16px rgba(0,230,180,0.8); }
 }
 
+/* Floating annotation tags */
 .sh-tag {
   position: absolute;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #00e6b4;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(0,230,180,0.5);
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(0,230,180,0.4);
   border-radius: 4px;
-  padding: 3px 8px;
+  padding: 3px 10px;
   z-index: 5;
   pointer-events: none;
-  animation: sh-tagFloat 6s ease-in-out infinite;
+  animation: sh-tagFloat 7s ease-in-out infinite;
+  backdrop-filter: blur(4px);
 }
-
-.sh-tag:nth-child(1) { top: 14%; left: 5%; animation-delay: 0s; }
-.sh-tag:nth-child(2) { top: 14%; right: 5%; animation-delay: 1s; color: #ffb400; border-color: rgba(255,180,0,0.5); }
-.sh-tag:nth-child(3) { bottom: 14%; left: 5%; animation-delay: 2s; color: #00b4ff; border-color: rgba(0,180,255,0.5); }
-.sh-tag:nth-child(4) { bottom: 14%; right: 5%; animation-delay: 3s; color: #ff507a; border-color: rgba(255,80,122,0.5); }
 
 @keyframes sh-tagFloat {
-  0%,100% { transform: translateY(0); opacity: 0.7; }
-  50%      { transform: translateY(-6px); opacity: 1; }
+  0%,100% { transform: translateY(0); opacity: 0.5; }
+  50%      { transform: translateY(-8px); opacity: 0.9; }
 }
 
+/* Segmentation readout info */
 .sh-seg-info {
   position: absolute;
   bottom: 48px;
-  right: 20px;
+  right: 24px;
   z-index: 5;
   pointer-events: none;
   text-align: right;
@@ -521,28 +508,31 @@
   display: block;
   font-family: 'Courier New', Courier, monospace;
   font-size: 10px;
-  color: rgba(0,230,180,0.7);
+  color: rgba(0,230,180,0.6);
   letter-spacing: 0.1em;
-  animation: sh-infoBlink 2s ease-in-out infinite alternate;
+  line-height: 1.6;
+  animation: sh-infoBlink 2.5s ease-in-out infinite alternate;
 }
 
 @keyframes sh-infoBlink {
-  from { opacity: 0.5; }
-  to   { opacity: 1; }
+  from { opacity: 0.4; }
+  to   { opacity: 0.85; }
 }
 
+/* Vignette */
 .sh-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
   pointer-events: none;
   z-index: 1;
 }
 
+/* Animated color accent bars */
 .sh-colorbar {
   position: absolute;
   left: 0; right: 0;
-  height: 3px;
+  height: 2px;
   z-index: 3;
   overflow: hidden;
   pointer-events: none;
@@ -554,10 +544,11 @@
   height: 100%;
   background: linear-gradient(90deg, #00e6b4, #00b4ff, #ffb400, #ff507a, #00e6b4);
   background-size: 200% 100%;
-  animation: sh-barSlide 3s linear infinite;
+  animation: sh-barSlide 4s linear infinite;
 }
 
 @keyframes sh-barSlide {
   from { background-position: 0% center; }
   to   { background-position: 200% center; }
 }
+

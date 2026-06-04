@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
-import { motion, useMotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 import SegmentationHeroVisual from "./SegmentationHeroVisual";
 
 const stats = [
@@ -12,84 +11,20 @@ const stats = [
 ];
 
 export default function HeroSection() {
-  const containerRef = useRef<HTMLElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function handleMouseMove(e: React.MouseEvent) {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    // Normalize to -0.5 … 0.5
-    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-
   return (
-    <section
-      ref={containerRef}
-      onMouseMove={handleMouseMove}
-      className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden"
-    >
-      {/* ──── Aurora Background ──── */}
-      <div className="absolute inset-0 z-0">
-        {/* Base gradient */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,212,255,0.08) 0%, transparent 60%), " +
-              "radial-gradient(ellipse 60% 80% at 20% 80%, rgba(124,58,237,0.06) 0%, transparent 50%), " +
-              "radial-gradient(ellipse 50% 50% at 80% 20%, rgba(34,197,94,0.04) 0%, transparent 50%)",
-          }}
-        />
+    <section className="relative w-full min-h-[100svh] flex flex-col justify-center items-center overflow-hidden">
+      {/* ──── Full-screen Segmentation Background ──── */}
+      <SegmentationHeroVisual />
 
-        {/* Aurora blobs — slow drifting */}
-        <motion.div
-          className="aurora-blob w-[600px] h-[600px] bg-primary/20 top-[-10%] left-[-5%]"
-          animate={{
-            x: [0, 80, -40, 0],
-            y: [0, -60, 40, 0],
-            scale: [1, 1.15, 0.95, 1],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="aurora-blob w-[500px] h-[500px] bg-secondary/15 bottom-[10%] right-[-5%]"
-          animate={{
-            x: [0, -60, 50, 0],
-            y: [0, 50, -70, 0],
-            scale: [1, 0.9, 1.1, 1],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="aurora-blob w-[400px] h-[400px] bg-tertiary/10 top-[40%] left-[30%]"
-          animate={{
-            x: [0, 40, -60, 0],
-            y: [0, -40, 30, 0],
-            scale: [1, 1.1, 0.9, 1],
-          }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      {/* Subtle dot grid texture */}
-      <div className="absolute inset-0 z-[1] dot-pattern opacity-20 pointer-events-none" />
-
-      {/* ──── Segmentation Spotlight Glow ──── */}
-      <div className="absolute right-0 lg:right-[10%] top-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full blur-3xl bg-primary/[0.08] z-[2] pointer-events-none" />
-
-      {/* ──── Main Content Container ──── */}
-      <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-[50] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 pt-28 pb-16 lg:pt-0 lg:pb-0">
-        
-        {/* ──── Left: Hero Content ──── */}
-        <div className="w-full lg:w-[50%] xl:w-[45%] flex flex-col justify-center space-y-7 md:space-y-9 text-center lg:text-left z-10 pt-4 lg:pt-0">
+      {/* ──── Content Layer ──── */}
+      <div className="relative z-[10] max-w-[1200px] mx-auto px-5 md:px-8 w-full text-center py-32 md:py-40">
+        <div className="flex flex-col items-center space-y-7 md:space-y-9">
           {/* Availability badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2.5 px-4 py-2.5 glass-pill text-on-surface-variant font-label-mono text-[11px] tracking-widest uppercase rounded-full mx-auto lg:mx-0 w-max"
+            className="inline-flex items-center gap-2.5 px-4 py-2.5 glass-pill text-on-surface-variant font-label-mono text-[11px] tracking-widest uppercase rounded-full w-max"
           >
             <span className="relative w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(34,197,94,0.6)]">
               <span className="absolute inset-0 rounded-full bg-tertiary animate-ping opacity-75" />
@@ -104,7 +39,7 @@ export default function HeroSection() {
             transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-3"
           >
-            <h1 className="font-display text-[2.4rem] leading-[1.08] sm:text-5xl md:text-[3.5rem] lg:text-[4rem] font-medium tracking-tight text-white">
+            <h1 className="font-display text-[2.4rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-medium tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
               Data Annotation,
               <br className="hidden sm:block" />{" "}
               Data Entry
@@ -114,7 +49,7 @@ export default function HeroSection() {
                 <br className="hidden sm:block" /> Assistance
               </span>
             </h1>
-            <p className="font-display text-xl sm:text-2xl md:text-3xl text-on-surface-variant/80 font-light tracking-tight">
+            <p className="font-display text-xl sm:text-2xl md:text-3xl text-on-surface-variant/90 font-light tracking-tight drop-shadow-[0_1px_10px_rgba(0,0,0,0.4)]">
               for Growing Teams.
             </p>
           </motion.div>
@@ -124,7 +59,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed mx-auto lg:mx-0"
+            className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-2xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.3)]"
           >
             I help AI teams, businesses, and busy professionals handle
             data entry, image annotation, customer support, and admin
@@ -136,7 +71,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start"
+            className="flex flex-col sm:flex-row gap-4 pt-2 justify-center"
           >
             <Link
               href="/contact"
@@ -151,7 +86,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/services"
-              className="group relative overflow-hidden border border-white/15 text-white font-label-mono text-xs sm:text-sm uppercase tracking-widest px-8 py-4 sm:py-5 rounded-full hover:border-white/30 hover:bg-white/5 transition-all duration-500 w-full sm:w-auto text-center flex items-center justify-center gap-3"
+              className="group relative overflow-hidden border border-white/15 text-white font-label-mono text-xs sm:text-sm uppercase tracking-widest px-8 py-4 sm:py-5 rounded-full hover:border-white/30 hover:bg-white/5 transition-all duration-500 w-full sm:w-auto text-center flex items-center justify-center gap-3 backdrop-blur-sm"
             >
               View My Services
               <span className="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">
@@ -165,9 +100,9 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-8 lg:mt-12 w-full flex justify-center lg:justify-start"
+            className="mt-8 lg:mt-12 w-full flex justify-center"
           >
-            <div className="glass-panel premium-border rounded-2xl md:rounded-full px-6 py-5 md:px-8 md:py-4 inline-flex flex-col sm:flex-row items-center gap-6 sm:gap-0 sm:divide-x sm:divide-white/10 w-full sm:w-auto">
+            <div className="glass-panel premium-border rounded-2xl md:rounded-full px-6 py-5 md:px-8 md:py-4 inline-flex flex-col sm:flex-row items-center gap-6 sm:gap-0 sm:divide-x sm:divide-white/10 w-full sm:w-auto backdrop-blur-md">
               {stats.map((stat) => (
                 <div key={stat.label} className="flex items-center gap-3 sm:px-6 first:sm:pl-0 last:sm:pr-0">
                   <span className="font-display text-xl md:text-2xl font-bold text-gradient-primary">
@@ -180,11 +115,6 @@ export default function HeroSection() {
               ))}
             </div>
           </motion.div>
-        </div>
-
-        {/* ──── Right: Floating Segmentation Images ──── */}
-        <div className="w-full lg:w-[50%] xl:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:h-[700px] flex items-center justify-center gap-6 mt-8 lg:mt-0 z-0">
-          <SegmentationHeroVisual />
         </div>
       </div>
 
