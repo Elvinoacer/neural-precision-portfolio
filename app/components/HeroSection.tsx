@@ -12,9 +12,9 @@ const IMAGES = [
     alt: "2D semantic segmentation — urban scene with annotated road, vehicles, trees, and buildings",
     width: 1000,
     height: 630,
-    displayClass: "w-[280px] sm:w-[340px] md:w-[450px]",
-    positionClass: "top-[8%] left-[3%] md:top-[6%] md:left-[2%]",
-    orbit: { x: [0, 30, -15, 0], y: [0, -25, 15, 0], duration: 25 },
+    displayClass: "w-[280px] sm:w-[320px] lg:w-[400px] xl:w-[450px]",
+    positionClass: "lg:top-[0%] lg:right-[10%] xl:top-[5%] xl:right-[15%]",
+    orbit: { x: [0, 20, -10, 0], y: [0, -15, 10, 0], duration: 25 },
     delay: 0.2,
     parallaxFactor: 30,
     preload: true,
@@ -24,9 +24,9 @@ const IMAGES = [
     alt: "2D image segmentation — street scene with color-coded road surfaces, vehicles, and sidewalks",
     width: 1000,
     height: 630,
-    displayClass: "w-[250px] sm:w-[300px] md:w-[380px]",
-    positionClass: "top-[30%] right-[2%] md:top-[22%] md:right-[3%]",
-    orbit: { x: [0, -20, 25, 0], y: [0, 20, -30, 0], duration: 30 },
+    displayClass: "w-[240px] sm:w-[280px] lg:w-[320px] xl:w-[360px]",
+    positionClass: "lg:top-[35%] lg:-right-[10%] xl:top-[40%] xl:-right-[5%]",
+    orbit: { x: [0, -15, 20, 0], y: [0, 15, -20, 0], duration: 30 },
     delay: 0.4,
     parallaxFactor: 20,
     preload: false,
@@ -36,9 +36,9 @@ const IMAGES = [
     alt: "2D image segmentation — highway scene with segmented guardrails, terrain, and sky regions",
     width: 1152,
     height: 648,
-    displayClass: "w-[270px] sm:w-[320px] md:w-[420px]",
-    positionClass: "bottom-[22%] left-[5%] md:bottom-[18%] md:left-[8%]",
-    orbit: { x: [0, 25, -20, 0], y: [0, -15, 25, 0], duration: 22 },
+    displayClass: "w-[260px] sm:w-[300px] lg:w-[380px] xl:w-[420px]",
+    positionClass: "lg:bottom-[5%] lg:left-[-5%] xl:bottom-[10%] xl:left-[0%]",
+    orbit: { x: [0, 20, -15, 0], y: [0, -10, 20, 0], duration: 22 },
     delay: 0.6,
     parallaxFactor: 25,
     preload: false,
@@ -68,7 +68,7 @@ export default function HeroSection() {
     <section
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full min-h-[100svh] flex flex-col justify-center overflow-hidden"
+      className="relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden"
     >
       {/* ──── Aurora Background ──── */}
       <div className="absolute inset-0 z-0">
@@ -117,67 +117,19 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-[1] dot-pattern opacity-20 pointer-events-none" />
 
       {/* ──── Segmentation Spotlight Glow ──── */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[900px] md:h-[900px] rounded-full blur-3xl bg-primary/[0.07] z-[2] pointer-events-none" />
+      <div className="absolute right-0 lg:right-[10%] top-1/2 -translate-y-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full blur-3xl bg-primary/[0.08] z-[2] pointer-events-none" />
 
-      {/* ──── Floating Segmentation Images ──── */}
-      <div className="absolute inset-0 z-[5] hidden md:block">
-        {IMAGES.map((img) => (
-          <AnimatedSegmentationCard
-            key={img.src}
-            src={img.src}
-            alt={img.alt}
-            width={img.width}
-            height={img.height}
-            orbitConfig={img.orbit}
-            delay={img.delay}
-            mouseX={mouseX}
-            mouseY={mouseY}
-            parallaxFactor={img.parallaxFactor}
-            preload={img.preload}
-            className={`${img.displayClass} ${img.positionClass}`}
-          />
-        ))}
-      </div>
-
-      {/* ──── Mobile: Stacked Segmentation Images ──── */}
-      <div className="relative z-[5] flex flex-col items-center gap-4 px-5 pt-24 pb-2 md:hidden">
-        {IMAGES.map((img, i) => (
-          <motion.div
-            key={img.src}
-            className={`glass-image-card ${img.displayClass}`}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{
-              opacity: 1,
-              scale: [1, 1.03, 1],
-              y: [0, -8, 0],
-            }}
-            transition={{
-              opacity: { duration: 0.6, delay: img.delay },
-              scale: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 },
-              y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: i * 0.7 },
-            }}
-          >
-            <img
-              src={img.src}
-              alt={img.alt}
-              width={img.width}
-              height={img.height}
-              className="w-full h-auto object-cover"
-              loading={i === 0 ? "eager" : "lazy"}
-            />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* ──── Hero Content ──── */}
-      <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-[50] pt-8 pb-8 md:pt-36 md:pb-12">
-        <div className="max-w-3xl mx-auto md:mx-0 space-y-7 md:space-y-9 text-center md:text-left">
+      {/* ──── Main Content Container ──── */}
+      <div className="max-w-[1400px] mx-auto px-5 md:px-8 w-full relative z-[50] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 pt-28 pb-16 lg:pt-0 lg:pb-0">
+        
+        {/* ──── Left: Hero Content ──── */}
+        <div className="w-full lg:w-[50%] xl:w-[45%] flex flex-col justify-center space-y-7 md:space-y-9 text-center lg:text-left z-10 pt-4 lg:pt-0">
           {/* Availability badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex items-center gap-2.5 px-4 py-2.5 glass-pill text-on-surface-variant font-label-mono text-[11px] tracking-widest uppercase rounded-full"
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2.5 px-4 py-2.5 glass-pill text-on-surface-variant font-label-mono text-[11px] tracking-widest uppercase rounded-full mx-auto lg:mx-0 w-max"
           >
             <span className="relative w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_rgba(34,197,94,0.6)]">
               <span className="absolute inset-0 rounded-full bg-tertiary animate-ping opacity-75" />
@@ -189,10 +141,10 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-3"
           >
-            <h1 className="font-display text-[2.4rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-[4.5rem] font-medium tracking-tight text-white">
+            <h1 className="font-display text-[2.4rem] leading-[1.08] sm:text-5xl md:text-[3.5rem] lg:text-[4rem] font-medium tracking-tight text-white">
               Data Annotation,
               <br className="hidden sm:block" />{" "}
               Data Entry
@@ -211,8 +163,8 @@ export default function HeroSection() {
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed mx-auto md:mx-0"
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="font-body-lg text-base sm:text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed mx-auto lg:mx-0"
           >
             I help AI teams, businesses, and busy professionals handle
             data entry, image annotation, customer support, and admin
@@ -223,8 +175,8 @@ export default function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row gap-4 pt-1"
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start"
           >
             <Link
               href="/contact"
@@ -247,35 +199,88 @@ export default function HeroSection() {
               </span>
             </Link>
           </motion.div>
+
+          {/* Stats bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-8 lg:mt-12 w-full flex justify-center lg:justify-start"
+          >
+            <div className="glass-panel premium-border rounded-2xl md:rounded-full px-6 py-5 md:px-8 md:py-4 inline-flex flex-col sm:flex-row items-center gap-6 sm:gap-0 sm:divide-x sm:divide-white/10 w-full sm:w-auto">
+              {stats.map((stat) => (
+                <div key={stat.label} className="flex items-center gap-3 sm:px-6 first:sm:pl-0 last:sm:pr-0">
+                  <span className="font-display text-xl md:text-2xl font-bold text-gradient-primary">
+                    {stat.value}
+                  </span>
+                  <span className="font-label-mono text-[10px] tracking-widest uppercase text-on-surface-variant leading-tight">
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Stats bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-12 md:mt-20"
-        >
-          <div className="glass-panel premium-border rounded-2xl md:rounded-full px-6 py-5 md:px-10 md:py-5 inline-flex flex-col sm:flex-row items-center gap-6 sm:gap-0 sm:divide-x sm:divide-white/10 w-full sm:w-auto">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex items-center gap-3 sm:px-8 first:sm:pl-0 last:sm:pr-0">
-                <span className="font-display text-2xl md:text-3xl font-bold text-gradient-primary">
-                  {stat.value}
-                </span>
-                <span className="font-label-mono text-[10px] sm:text-xs tracking-widest uppercase text-on-surface-variant leading-tight">
-                  {stat.label}
-                </span>
-              </div>
+        {/* ──── Right: Floating Segmentation Images ──── */}
+        <div className="w-full lg:w-[50%] xl:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:h-[700px] flex flex-col lg:block items-center justify-center gap-6 mt-8 lg:mt-0 z-0">
+          {/* Desktop: Floating Images (Absolute positioning) */}
+          <div className="hidden lg:block absolute inset-0">
+            {IMAGES.map((img) => (
+              <AnimatedSegmentationCard
+                key={img.src}
+                src={img.src}
+                alt={img.alt}
+                width={img.width}
+                height={img.height}
+                orbitConfig={img.orbit}
+                delay={img.delay}
+                mouseX={mouseX}
+                mouseY={mouseY}
+                parallaxFactor={img.parallaxFactor}
+                preload={img.preload}
+                className={`${img.displayClass} ${img.positionClass}`}
+              />
             ))}
           </div>
-        </motion.div>
+
+          {/* Mobile/Tablet: Stacked Images (Flex layout) */}
+          <div className="lg:hidden flex flex-col sm:flex-row flex-wrap justify-center items-center gap-6 w-full">
+            {IMAGES.map((img, i) => (
+              <motion.div
+                key={img.src}
+                className={`glass-image-card ${img.displayClass} relative`}
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{
+                  opacity: 1,
+                  scale: [1, 1.03, 1],
+                  y: [0, -8, 0],
+                }}
+                transition={{
+                  opacity: { duration: 0.6, delay: img.delay },
+                  scale: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 },
+                  y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: i * 0.7 },
+                }}
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  width={img.width}
+                  height={img.height}
+                  className="w-full h-auto object-cover"
+                  loading={i === 0 ? "eager" : "lazy"}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.3, duration: 0.6 }}
+        transition={{ delay: 1.0, duration: 0.6 }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-2"
       >
         <span className="font-label-mono text-[9px] tracking-[0.25em] uppercase text-muted">Scroll</span>
