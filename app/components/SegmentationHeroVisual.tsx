@@ -46,7 +46,7 @@ export default function SegmentationHeroVisual() {
         style={{ perspective: "1200px" }}
       >
         <motion.div
-          className="relative w-[320px] h-[220px] md:w-[450px] md:h-[280px]"
+          className="relative w-[280px] h-[180px] sm:w-[320px] sm:h-[220px] md:w-[450px] md:h-[280px]"
           style={{ transformStyle: "preserve-3d" }}
           animate={{ rotateY: [0, -360] }}
           transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
@@ -55,29 +55,29 @@ export default function SegmentationHeroVisual() {
             const angle = (360 / PANEL_COUNT) * i;
             // Create a wavy helix offset using a sine wave so it loops seamlessly
             const yOffset = Math.sin((i / PANEL_COUNT) * Math.PI * 2) * 120;
-            // Push panels outward to form the cylinder radius
-            const translateZ = "min(85vw, 800px)"; 
+            // Use a fixed translateZ to ensure CSS engine compatibility in inline styles
+            const translateZ = 750; 
 
             return (
               <div
                 key={i}
-                className="absolute inset-0 premium-border rounded-xl md:rounded-2xl overflow-hidden glass-panel"
+                className="absolute inset-0 premium-border rounded-xl md:rounded-2xl overflow-hidden glass-panel shadow-[0_0_30px_rgba(0,212,255,0.15)]"
                 style={{
-                  transform: `rotateY(${angle}deg) translateZ(${translateZ}) translateY(${yOffset}px)`,
-                  backfaceVisibility: "hidden", // Hide panels on the back of the cylinder to prevent visual clutter
-                  opacity: 0.85,
+                  transform: `rotateY(${angle}deg) translateZ(${translateZ}px) translateY(${yOffset}px)`,
+                  // Removed backfaceVisibility so we can see the full helix spiral (front and back)
+                  // Removed mix-blend-screen as it causes rendering bugs inside preserve-3d contexts
+                  opacity: 0.7,
                 }}
               >
                 <Image
                   src={src}
                   alt={`Segmentation panel ${i + 1}`}
                   fill
-                  className="object-cover opacity-80 mix-blend-screen"
+                  className="object-cover"
                   quality={75}
                   sizes="(max-width: 768px) 320px, 450px"
                 />
-                {/* Panel specific glowing scanline or overlay can go here if needed */}
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent pointer-events-none" />
               </div>
             );
           })}
