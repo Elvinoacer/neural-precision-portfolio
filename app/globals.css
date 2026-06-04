@@ -221,6 +221,40 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2), transparent);
   }
+
+  /* Glass image card for segmentation gallery */
+  .glass-image-card {
+    border-radius: 32px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+    position: relative;
+  }
+  .glass-image-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    z-index: 10;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Aurora blob base style */
+  .aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Certificate card perspective wrapper */
+  .cert-perspective {
+    perspective: 1200px;
+  }
 }
 
 /* ===== KEYFRAMES ===== */

@@ -4,6 +4,7 @@ import TrustMarquee from "./components/TrustMarquee";
 import PainPointsSection from "./components/PainPointsSection";
 import ServicesSnapshot from "./components/ServicesSnapshot";
 import WhoIHelpSection from "./components/WhoIHelpSection";
+import CertificationSection from "./components/CertificationSection";
 import WhyChooseMeSection from "./components/WhyChooseMeSection";
 import ProcessSection from "./components/ProcessSection";
 import ProofSection from "./components/ProofSection";
@@ -33,6 +34,7 @@ export default function Home() {
       <PainPointsSection />
       <ServicesSnapshot />
       <WhoIHelpSection />
+      <CertificationSection />
       <WhyChooseMeSection />
       <ProcessSection />
       <ProofSection />
@@ -40,3 +42,4 @@ export default function Home() {
     </>
   );
 }
+
