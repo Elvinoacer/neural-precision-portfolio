@@ -10,8 +10,8 @@ const BASE_IMAGES = [
   "/images/landingpage_smooth_animations/image3.png",
 ];
 
-// Duplicate images to create a continuous 12-panel cylinder
-const PANEL_COUNT = 12;
+// Duplicate images to create a continuous 18-panel cylinder
+const PANEL_COUNT = 18;
 const IMAGES = Array.from({ length: PANEL_COUNT }, (_, i) => BASE_IMAGES[i % BASE_IMAGES.length]);
 
 const TAGS = [
@@ -42,31 +42,30 @@ export default function SegmentationHeroVisual() {
     <div className="absolute inset-0 z-0 overflow-hidden bg-black flex items-center justify-center">
       {/* ──── 3D Cylinder Scene ──── */}
       <div 
-        className="absolute inset-0 flex items-center justify-center" 
+        className="absolute inset-0 flex items-center justify-center lg:translate-x-1/4" 
         style={{ perspective: "1200px" }}
       >
         <motion.div
           className="relative w-[280px] h-[180px] sm:w-[320px] sm:h-[220px] md:w-[450px] md:h-[280px]"
           style={{ transformStyle: "preserve-3d" }}
           animate={{ rotateY: [0, -360] }}
-          transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
         >
           {IMAGES.map((src, i) => {
             const angle = (360 / PANEL_COUNT) * i;
-            // Create a wavy helix offset using a sine wave so it loops seamlessly
-            const yOffset = Math.sin((i / PANEL_COUNT) * Math.PI * 2) * 120;
-            // Use a fixed translateZ to ensure CSS engine compatibility in inline styles
-            const translateZ = 750; 
+            const helixHeight = 600;
+            const yOffset = ((i / PANEL_COUNT) * helixHeight) - helixHeight / 2;
+            const translateZ = 300; 
 
             return (
               <div
                 key={i}
-                className="absolute inset-0 premium-border rounded-xl md:rounded-2xl overflow-hidden glass-panel shadow-[0_0_30px_rgba(0,212,255,0.15)]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[180px] md:w-[380px] md:h-[240px] premium-border rounded-xl md:rounded-2xl overflow-hidden glass-panel shadow-[0_0_30px_rgba(0,212,255,0.15)]"
                 style={{
                   transform: `rotateY(${angle}deg) translateZ(${translateZ}px) translateY(${yOffset}px)`,
                   // Removed backfaceVisibility so we can see the full helix spiral (front and back)
                   // Removed mix-blend-screen as it causes rendering bugs inside preserve-3d contexts
-                  opacity: 0.7,
+                  opacity: 1,
                 }}
               >
                 <Image
@@ -89,7 +88,7 @@ export default function SegmentationHeroVisual() {
         className="absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.7) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.65) 100%)",
         }}
       />
 
