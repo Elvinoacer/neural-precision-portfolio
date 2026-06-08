@@ -79,7 +79,7 @@ export default function ContactPage() {
             <div className="flex flex-col gap-4 md:gap-6">
               <a
                 className="flex items-center gap-4 md:gap-6 p-4 md:p-6 glass-panel premium-border rounded-xl md:rounded-2xl group transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
-                href="mailto:everlineauma46@gmail.com"
+                href="mailto:everlineauma.ke@gmail.com"
               >
                 <div className="w-12 h-12 md:w-14 md:h-14 rounded-full glass-pill flex items-center justify-center border border-primary/20 group-hover:border-primary/50 transition-colors shrink-0">
                   <span
@@ -94,7 +94,7 @@ export default function ContactPage() {
                     Direct Email
                   </h3>
                   <p className="font-body-lg text-base md:text-lg text-white group-hover:text-primary transition-colors truncate">
-                    everlineauma46@gmail.com
+                    everlineauma.ke@gmail.com
                   </p>
                 </div>
               </a>
@@ -118,7 +118,7 @@ export default function ContactPage() {
                     WhatsApp
                   </h3>
                   <p className="font-body-lg text-base md:text-lg text-white group-hover:text-whatsapp transition-colors">
-                    +254 792 038496
+                    +254795706164
                   </p>
                 </div>
               </a>
@@ -140,7 +140,7 @@ export default function ContactPage() {
                     Phone
                   </h3>
                   <p className="font-body-lg text-base md:text-lg text-white group-hover:text-secondary transition-colors">
-                    +254 792 038496
+                    +254795706164
                   </p>
                 </div>
               </a>

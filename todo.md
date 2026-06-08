@@ -71,13 +71,13 @@ Copy:
 
 Include:
 
-* Image annotation
-* Segmentation annotation
-* Road hazard annotation
-* 2D image annotation
-* gNext annotation
-* Quality review
-* Dataset organization
+- Image annotation
+- Segmentation annotation
+- Road hazard annotation
+- 2D image annotation
+- gNext annotation
+- Quality review
+- Dataset organization
 
 CTA:
 
@@ -91,13 +91,13 @@ Copy:
 
 Include:
 
-* Data entry
-* Email management
-* Customer support
-* Calendar support
-* CRM updates
-* Document organization
-* Online research
+- Data entry
+- Email management
+- Customer support
+- Calendar support
+- CRM updates
+- Document organization
+- Online research
 
 CTA:
 
@@ -111,11 +111,11 @@ Copy:
 
 Include:
 
-* Ticket handling
-* Live chat support
-* Customer follow-up
-* Support documentation
-* Escalation tracking
+- Ticket handling
+- Live chat support
+- Customer follow-up
+- Support documentation
+- Escalation tracking
 
 #### AI / LLM Training Support
 
@@ -125,11 +125,11 @@ Copy:
 
 Include:
 
-* Response rating
-* Prompt evaluation
-* Data cleaning
-* Content categorization
-* Model feedback tasks
+- Response rating
+- Prompt evaluation
+- Data cleaning
+- Content categorization
+- Model feedback tasks
 
 ---
 
@@ -151,10 +151,10 @@ Suggested copy:
 
 Add credibility blocks:
 
-* Based in Kenya, available remotely
-* Experienced with CVAT, Labelbox, Google Workspace, Slack, Trello, Asana, Zoom
-* Strong in time management, communication, and task accuracy
-* Open to long-term and project-based work
+- Based in Kenya, available remotely
+- Experienced with CVAT, Labelbox, Google Workspace, Slack, Trello, Asana, Zoom
+- Strong in time management, communication, and task accuracy
+- Open to long-term and project-based work
 
 CTA:
 
@@ -174,11 +174,11 @@ Create categories:
 
 Show:
 
-* Before/after annotation examples
-* Segmentation examples
-* Road hazard labeling examples
-* Tool screenshots where possible
-* Description of task, objective, and outcome
+- Before/after annotation examples
+- Segmentation examples
+- Road hazard labeling examples
+- Tool screenshots where possible
+- Description of task, objective, and outcome
 
 Example case study layout:
 
@@ -192,19 +192,19 @@ Example case study layout:
 
 Show:
 
-* Data entry sample sheet
-* Email response templates
-* Customer support response examples
-* Trello/Asana workflow example
-* Research/document formatting sample
+- Data entry sample sheet
+- Email response templates
+- Customer support response examples
+- Trello/Asana workflow example
+- Research/document formatting sample
 
 #### Customer Support Samples
 
 Show:
 
-* Sample ticket response
-* Escalation workflow
-* Customer follow-up template
+- Sample ticket response
+- Escalation workflow
+- Customer follow-up template
 
 Do not overload this page. Use clean cards, short descriptions, and “View sample” modals.
 
@@ -224,20 +224,20 @@ Use three conversion paths:
 
 #### Fast Contact
 
-> WhatsApp: +254 792 038496
+> WhatsApp: +254795706164
 > Email: [lindahlish18@gmail.com](mailto:lindahlish18@gmail.com)
 
 #### Smart Contact Form
 
 Fields should be:
 
-* Name
-* Email / WhatsApp number
-* Service needed
-* Project type
-* Expected timeline
-* Message
-* Budget range, optional
+- Name
+- Email / WhatsApp number
+- Service needed
+- Project type
+- Expected timeline
+- Message
+- Budget range, optional
 
 Replace “Transmit Message” with:
 
@@ -318,12 +318,12 @@ Example:
 
 Cards:
 
-* AI and machine learning teams
-* Data labeling companies
-* Startups and founders
-* E-commerce businesses
-* Agencies
-* Busy professionals
+- AI and machine learning teams
+- Data labeling companies
+- Startups and founders
+- E-commerce businesses
+- Agencies
+- Busy professionals
 
 ---
 
@@ -333,13 +333,13 @@ Current “Why Choose Me” is okay but soft.
 
 Use stronger conversion points:
 
-* Accuracy-first work ethic
-* Clear communication
-* Fast turnaround
-* Remote-ready collaboration
-* Tool flexibility
-* Deadline discipline
-* Confidential and professional handling of data
+- Accuracy-first work ethic
+- Clear communication
+- Fast turnaround
+- Remote-ready collaboration
+- Tool flexibility
+- Deadline discipline
+- Confidential and professional handling of data
 
 Example copy:
 
@@ -377,13 +377,13 @@ If she does not have testimonials yet, use “proof of capability.”
 
 Examples:
 
-* Tools she uses
-* Sample tasks
-* Before/after examples
-* Work process
-* Accuracy checklist
-* Availability
-* Sample deliverables
+- Tools she uses
+- Sample tasks
+- Before/after examples
+- Work process
+- Accuracy checklist
+- Availability
+- Sample deliverables
 
 Use text like:
 
@@ -426,15 +426,15 @@ Keep the current dark premium theme, but reduce the “sci-fi overload.”
 
 Use:
 
-* Deep navy / charcoal background
-* Teal and cyan highlights
-* Glass cards only in key places
-* Cleaner spacing
-* Fewer huge glowing blobs
-* More real human portrait usage
-* Premium typography
-* Better contrast for readability
-* Smaller text on mobile but strong hierarchy
+- Deep navy / charcoal background
+- Teal and cyan highlights
+- Glass cards only in key places
+- Cleaner spacing
+- Fewer huge glowing blobs
+- More real human portrait usage
+- Premium typography
+- Better contrast for readability
+- Smaller text on mobile but strong hierarchy
 
 The site should feel like:
 
@@ -460,11 +460,11 @@ This is not enough.
 
 Use one of these:
 
-* EmailJS
-* Resend
-* Formspree
-* Next.js API route + Resend
-* WhatsApp redirect after form submission
+- EmailJS
+- Resend
+- Formspree
+- Next.js API route + Resend
+- WhatsApp redirect after form submission
 
 Best simple approach:
 
@@ -479,13 +479,13 @@ Next.js API route → Resend email → success toast → WhatsApp fallback
 Current:
 
 ```tsx
-preload="auto"
+preload = "auto";
 ```
 
 Change to:
 
 ```tsx
-preload="metadata"
+preload = "metadata";
 ```
 
 Or remove the video on mobile and use the portrait/optimized background instead.

@@ -3,13 +3,20 @@ import nodemailer from "nodemailer";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fullName, emailOrWhatsapp, serviceNeeded, timeline, projectDetails, budget } = body;
+    const {
+      fullName,
+      emailOrWhatsapp,
+      serviceNeeded,
+      timeline,
+      projectDetails,
+      budget,
+    } = body;
 
     // Validate required fields
     if (!fullName || !emailOrWhatsapp || !serviceNeeded || !projectDetails) {
       return Response.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -274,7 +281,7 @@ export async function POST(request: Request) {
 
     const mailOptions = {
       from: `"Everlyn Linda Portfolio" <${process.env.EMAIL_SERVER_USER}>`,
-      to: "everlineauma46@gmail.com",
+      to: "everlineauma.ke@gmail.com",
       subject: `✦ New Project Request — ${serviceNeeded} from ${fullName}`,
       text: `
 New Project Request
@@ -300,22 +307,23 @@ Sent via your portfolio contact form.
 
     const whatsappMessage = encodeURIComponent(
       `New project request from ${fullName}:\n` +
-      `Service: ${serviceNeeded}\n` +
-      `Timeline: ${timeline || "Not specified"}\n` +
-      `Details: ${projectDetails}`
+        `Service: ${serviceNeeded}\n` +
+        `Timeline: ${timeline || "Not specified"}\n` +
+        `Details: ${projectDetails}`,
     );
     const whatsappUrl = `https://wa.me/254792038496?text=${whatsappMessage}`;
 
     return Response.json({
       success: true,
-      message: "Your project request has been received. I'll respond within 24 hours.",
+      message:
+        "Your project request has been received. I'll respond within 24 hours.",
       whatsappUrl,
     });
   } catch (error) {
     console.error("Email sending failed:", error);
     return Response.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
