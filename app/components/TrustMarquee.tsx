@@ -1,17 +1,17 @@
 export default function TrustMarquee() {
   const items = [
-    "Data Annotation",
-    "Image Segmentation",
-    "Data Entry",
-    "Spreadsheet Management",
-    "Virtual Assistance",
-    "Customer Support",
-    "AI Training",
-    "LLM Evaluation",
-    "CRM Management",
-    "Admin Operations",
-    "CVAT",
-    "Labelbox",
+    "3D LiDAR Point Clouds",
+    "2D Image Segmentation",
+    "Semantic Segmentation",
+    "Instance Segmentation",
+    "Bounding Box (2D & 3D Cuboids)",
+    "Polygon Vector Contours",
+    "Data Entry & Cleansing",
+    "Virtual Assistant Services",
+    "9-DOF Heading Orientations",
+    "Sub-Pixel Edge Precision",
+    "CVAT & Labelbox Toolchains",
+    "99.8% Ground Truth QA",
   ];
 
   // Duplicate the list for seamless looping

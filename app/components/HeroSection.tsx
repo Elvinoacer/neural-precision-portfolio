@@ -2,10 +2,14 @@
 
 import Hero3DStudio from "./Hero3DStudio";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  onSelectProject?: (projectId: string) => void;
+}
+
+export default function HeroSection({ onSelectProject }: HeroSectionProps = {}) {
   return (
-    <section className="relative w-full min-h-[100svh] overflow-hidden bg-black flex flex-col justify-center items-center">
-      <Hero3DStudio />
+    <section id="hero" className="relative w-full min-h-[100svh] overflow-hidden bg-[#070b0e]">
+      <Hero3DStudio onSelectProject={onSelectProject} />
     </section>
   );
 }

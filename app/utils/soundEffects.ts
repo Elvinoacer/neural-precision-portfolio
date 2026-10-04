@@ -2,7 +2,7 @@
 
 class SoundController {
   private ctx: AudioContext | null = null;
-  public isMuted: boolean = false;
+  public isMuted: boolean = true;
 
   private initCtx() {
     if (typeof window === "undefined") return;

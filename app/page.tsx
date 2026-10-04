@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HeroSection from "./components/HeroSection";
 import TrustMarquee from "./components/TrustMarquee";
+import DisciplinesHighlightSection from "./components/DisciplinesHighlightSection";
 import InteractiveVisionStudio from "./components/InteractiveVisionStudio";
 import PainPointsSection from "./components/PainPointsSection";
 import ServicesSnapshot from "./components/ServicesSnapshot";
@@ -31,6 +32,7 @@ export default function Home() {
     <>
       <HeroSection />
       <TrustMarquee />
+      <DisciplinesHighlightSection />
       <InteractiveVisionStudio />
       <PainPointsSection />
       <ServicesSnapshot />

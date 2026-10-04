@@ -1,27 +1,28 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import CTASection from "../components/CTASection";
+import PortfolioInteractiveGallery from "../components/PortfolioInteractiveGallery";
 
 export const metadata: Metadata = {
-  title: "Work Samples & Portfolio — Data Annotation, VA & Customer Support",
+  title: "Work Samples & Portfolio — 3D LiDAR, 2D Segmentation & VA Deliverables",
   description:
-    "View Everlyn Linda's work samples: semantic segmentation, road hazard bounding box annotation, LLM evaluation, data entry workflows, email management templates, and customer support examples. Evidence of quality and precision.",
+    "Explore Everlyn Linda's complete 24-project portfolio: 3D LiDAR point clouds, 2D & semantic segmentation, instance masks, bounding boxes, polygon vectors, AI dataset cleaning, spreadsheet data entry, and executive virtual assistant workflows.",
   alternates: {
     canonical: "/portfolio",
   },
   openGraph: {
     title:
-      "Work Samples & Portfolio — Data Annotation & Virtual Assistant | Everlyn Linda",
+      "Work Samples & Portfolio — 3D LiDAR, Segmentation & VA | Everlyn Linda",
     description:
-      "View Everlyn Linda's portfolio: data annotation projects, image segmentation samples, virtual assistant workflows, and customer support case studies.",
+      "24 real production deliverables: 3D LiDAR point clouds, semantic segmentation, bounding boxes, polygon contours, data entry, and virtual assistant operations.",
     url: "/portfolio",
     type: "website",
     images: [
       {
-        url: "/images/i1.jpeg",
-        width: 1200,
-        height: 630,
-        alt: "Everlyn Linda Portfolio — Semantic Segmentation Sample",
+        url: "/gallery/3d-lidar/multi-object-detection.png",
+        width: 1600,
+        height: 536,
+        alt: "Everlyn Linda Portfolio — 3D LiDAR Multi-Object Detection",
       },
     ],
   },
@@ -29,33 +30,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Work Samples & Portfolio | Everlyn Linda",
     description:
-      "Data annotation, image segmentation, VA workflows, and customer support samples. Evidence of quality and precision.",
-    images: ["/images/i1.jpeg"],
+      "3D LiDAR, 2D segmentation, bounding box, polygon, data entry, and virtual assistant deliverables.",
+    images: ["/gallery/3d-lidar/multi-object-detection.png"],
   },
 };
-
-const annotationSamples = [
-  {
-    title: "Road Hazard Annotation",
-    tag: "Bounding Box",
-    tagColor: "secondary",
-    image: "/images/i2.jpeg",
-    task: "Label road hazards from image datasets for autonomous driving models",
-    tools: "CVAT / Labelbox",
-    focus: "Accuracy, consistency, object boundaries, clear categorization",
-    outcome: "Clean labeled data ready for review or model training",
-  },
-  {
-    title: "Semantic Segmentation",
-    tag: "Pixel-Level",
-    tagColor: "primary",
-    image: "/images/i1.jpeg",
-    task: "Dense lane annotations and boundary separation for road scenes",
-    tools: "Labelbox / Brush & Polygon tools",
-    focus: "Pixel-level precision, class consistency, edge accuracy",
-    outcome: "High-fidelity segmentation masks for computer vision pipelines",
-  },
-];
 
 const dataEntrySamples = [
   {
@@ -116,25 +94,6 @@ const supportSamples = [
   },
 ];
 
-const portfolioGallery = [
-  {
-    title: "Road Scene Segmentation",
-    image: "/images/portfolios/p1.png",
-    alt: "Annotated road scene with semantic segmentation overlays",
-  },
-  {
-    title: "Vehicle Detection Sample",
-    image: "/images/portfolios/p2.png",
-    alt: "Annotated vehicle scene with bounding boxes and segmentation overlays",
-  },
-];
-
-const tagColorMap: Record<string, string> = {
-  primary: "text-primary border-primary/20",
-  secondary: "text-secondary border-secondary/20",
-  tertiary: "text-tertiary border-tertiary/20",
-};
-
 export default function PortfolioPage() {
   return (
     <>
@@ -170,139 +129,34 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* Data Annotation Samples */}
+      {/* Category 01: Complete 24 Computer Vision & Sensor Projects */}
       <section className="w-full py-16 md:py-24 relative bg-surface-container-lowest section-divider">
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
-          <div className="mb-10 md:mb-16">
-            <span className="font-label-mono text-xs uppercase tracking-widest text-primary mb-3 block">
-              Category 01
-            </span>
-            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-              Data Annotation{" "}
-              <span className="font-bold text-gradient-primary">Samples</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {annotationSamples.map((sample) => (
-              <article
-                key={sample.title}
-                className="glass-panel premium-border rounded-2xl md:rounded-3xl overflow-hidden group shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
-              >
-                <div className="relative h-[220px] sm:h-[280px] md:h-[320px] w-full bg-surface-dim overflow-hidden">
-                  <Image
-                    alt={sample.title}
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
-                    src={sample.image}
-                    width={600}
-                    height={320}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/50 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <span
-                      className={`glass-pill px-3 py-1.5 font-label-mono text-[10px] tracking-widest uppercase rounded-full border ${tagColorMap[sample.tagColor]}`}
-                    >
-                      {sample.tag}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6 sm:p-8">
-                  <h3 className="font-display text-xl md:text-2xl text-white mb-4 tracking-tight font-medium">
-                    {sample.title}
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex gap-3">
-                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-16 shrink-0 pt-0.5">
-                        Task
-                      </span>
-                      <span className="text-on-surface-variant font-body-md">
-                        {sample.task}
-                      </span>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-16 shrink-0 pt-0.5">
-                        Tools
-                      </span>
-                      <span className="text-on-surface-variant font-body-md">
-                        {sample.tools}
-                      </span>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-16 shrink-0 pt-0.5">
-                        Focus
-                      </span>
-                      <span className="text-on-surface-variant font-body-md">
-                        {sample.focus}
-                      </span>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-muted w-16 shrink-0 pt-0.5">
-                        Result
-                      </span>
-                      <span className="text-on-surface-variant font-body-md">
-                        {sample.outcome}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Portfolio Gallery */}
-      <section className="w-full py-16 md:py-24 relative bg-surface-container-lowest section-divider">
-        <div className="max-w-[1400px] mx-auto px-5 md:px-8">
-          <div className="mb-10 md:mb-16 flex items-end justify-between gap-6 flex-wrap">
+          <div className="mb-10 md:mb-14 flex items-end justify-between gap-6 flex-wrap">
             <div>
-              <span className="font-label-mono text-xs uppercase tracking-widest text-secondary mb-3 block">
-                Category 01B
+              <span className="font-label-mono text-xs uppercase tracking-widest text-primary mb-3 block">
+                Category 01 // 24 Production Datasets
               </span>
-              <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-                Portfolio{" "}
-                <span className="font-bold text-gradient-secondary">
-                  Gallery
+              <h2 className="font-display text-2xl sm:text-3xl md:text-5xl text-white tracking-tight font-light">
+                Computer Vision &amp; Sensor{" "}
+                <span className="font-bold text-gradient-primary">
+                  Deliverables
                 </span>
               </h2>
             </div>
             <p className="font-body-md text-sm sm:text-base text-on-surface-variant max-w-xl leading-relaxed">
-              Two labeled scene examples from the portfolio image set, shown
-              here in the same visual language as the rest of the site.
+              Every production sample below has been annotated by Everlyn Linda under verified QA standards. Filter across 3D LiDAR point clouds, 2D segmentation, semantic masks, instance separation, bounding boxes, and complex polygon vectors.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-            {portfolioGallery.map((item) => (
-              <article
-                key={item.title}
-                className="glass-panel premium-border rounded-2xl md:rounded-3xl overflow-hidden group shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
-              >
-                <div className="relative h-60 sm:h-75 md:h-90 w-full bg-surface-dim overflow-hidden">
-                  <Image
-                    alt={item.alt}
-                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
-                    src={item.image}
-                    width={1200}
-                    height={720}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-surface-container-lowest via-surface-container-lowest/35 to-transparent"></div>
-                </div>
-                <div className="p-6 sm:p-8">
-                  <h3 className="font-display text-xl md:text-2xl text-white tracking-tight font-medium">
-                    {item.title}
-                  </h3>
-                </div>
-              </article>
-            ))}
-          </div>
+          <PortfolioInteractiveGallery />
         </div>
       </section>
 
       {/* AI Dataset Cleaning Sample */}
       <section
         id="ai-dataset-cleaning"
-        className="w-full py-16 md:py-24 relative bg-surface-dim section-divider"
+        className="w-full py-16 md:py-24 relative bg-surface-dim section-divider scroll-mt-20"
       >
         <div className="max-w-[1400px] mx-auto px-5 md:px-8">
           {/* Section Header */}
@@ -551,7 +405,7 @@ export default function PortfolioPage() {
               Category 04
             </span>
             <h2 className="font-display text-2xl sm:text-3xl md:text-4xl text-white tracking-tight font-light">
-              Virtual Assistant <span className="font-bold">Samples</span>
+              Virtual Assistant Services <span className="font-bold text-gradient-tertiary">Samples</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">

@@ -4,19 +4,72 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import * as THREE from "three";
-import { GALLERY_PROJECTS, GalleryProject, AnnotationBox } from "../data/galleryData";
+import {
+  GALLERY_PROJECTS,
+  GalleryProject,
+  AnnotationBox,
+  NON_VISION_DELIVERABLES,
+  NonVisionDeliverable,
+} from "../data/galleryData";
 import { soundFx } from "../utils/soundEffects";
 
-type StudioMode = "3d-spatial" | "curtain-split" | "inspector" | "challenge";
+type StudioCategory =
+  | "all"
+  | "3d-lidar"
+  | "2d-segmentation"
+  | "semantic"
+  | "instance"
+  | "bounding-box"
+  | "polygon"
+  | "data-entry"
+  | "virtual-assistant";
 
-export default function InteractiveVisionStudio() {
-  const [activeCategory, setActiveCategory] = useState<"all" | "lidar" | "segmentation">("all");
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(GALLERY_PROJECTS[0].id);
+type StudioMode = "3d-spatial" | "curtain-split" | "inspector" | "challenge";
+export type StudioCameraPreset = "orbit" | "front" | "isometric" | "bev";
+
+interface InteractiveVisionStudioProps {
+  initialProjectId?: string;
+  initialCategory?: StudioCategory;
+}
+
+export default function InteractiveVisionStudio({
+  initialProjectId,
+  initialCategory,
+}: InteractiveVisionStudioProps = {}) {
+  const [activeCategory, setActiveCategory] = useState<StudioCategory>(() => {
+    if (initialCategory) return initialCategory;
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get("category");
+      if (cat) return cat as StudioCategory;
+    }
+    return "all";
+  });
+
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(() => {
+    if (initialProjectId && GALLERY_PROJECTS.some((p) => p.id === initialProjectId)) {
+      return initialProjectId;
+    }
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const proj = params.get("project");
+      if (proj && GALLERY_PROJECTS.some((p) => p.id === proj)) {
+        return proj;
+      }
+    }
+    return GALLERY_PROJECTS[0].id;
+  });
   const [activeMode, setActiveMode] = useState<StudioMode>("3d-spatial");
-  
+  const [depthScale, setDepthScale] = useState<number>(1.0);
+  const [cameraPreset, setCameraPreset] = useState<StudioCameraPreset>("orbit");
+
+  // Non-vision interactive workbench state
+  const [selectedNonVisionId, setSelectedNonVisionId] = useState<string>("de-ai-cleaning");
+  const [dataEntryCleanState, setDataEntryCleanState] = useState<"raw" | "cleaned">("cleaned");
+  const [activeInboxFilter, setActiveInboxFilter] = useState<"all" | "urgent" | "clients" | "resolved">("all");
+
   // Layer toggles
   const [showBoxes, setShowBoxes] = useState(true);
-  const [showMask, setShowMask] = useState(true);
   const [showPointCloud, setShowPointCloud] = useState(true);
   const [showScanline, setShowScanline] = useState(true);
   const [isolatedClass, setIsolatedClass] = useState<string | null>(null);
@@ -46,15 +99,36 @@ export default function InteractiveVisionStudio() {
     wireframeBoxes: THREE.Group;
     pointCloud: THREE.Points;
     laserPlane: THREE.Mesh;
+    setCameraPreset: (preset: StudioCameraPreset) => void;
+    setDepthScale: (scale: number) => void;
+    resetCamera: () => void;
     cleanup: () => void;
   } | null>(null);
 
   const activeProject: GalleryProject =
     GALLERY_PROJECTS.find((p) => p.id === selectedProjectId) || GALLERY_PROJECTS[0];
 
+  const activeNonVision: NonVisionDeliverable =
+    NON_VISION_DELIVERABLES.find((d) => d.id === selectedNonVisionId) || NON_VISION_DELIVERABLES[0];
+
+  const isNonVisionCategory =
+    activeCategory === "data-entry" || activeCategory === "virtual-assistant";
+
   const filteredProjects = GALLERY_PROJECTS.filter((p) => {
     if (activeCategory === "all") return true;
-    return p.category === activeCategory;
+    if (activeCategory === "3d-lidar") return p.disciplines.includes("3D LiDAR");
+    if (activeCategory === "2d-segmentation") return p.disciplines.includes("2D Segmentation");
+    if (activeCategory === "semantic") return p.disciplines.includes("Semantic Segmentation");
+    if (activeCategory === "instance") return p.disciplines.includes("Instance Segmentation");
+    if (activeCategory === "bounding-box") return p.disciplines.includes("Bounding box");
+    if (activeCategory === "polygon") return p.disciplines.includes("Polygon");
+    return true;
+  });
+
+  const filteredNonVision = NON_VISION_DELIVERABLES.filter((d) => {
+    if (activeCategory === "data-entry") return d.discipline === "Data Entry";
+    if (activeCategory === "virtual-assistant") return d.discipline === "Virtual Assistant Services";
+    return true;
   });
 
   // Handle Project Change
@@ -66,11 +140,78 @@ export default function InteractiveVisionStudio() {
     soundFx.playClick();
   };
 
+  // Cross-component communication listener
+  useEffect(() => {
+    const handleLaunchWorkbench = (
+      e: CustomEvent<{ projectId?: string; category?: string }>
+    ) => {
+      if (e.detail?.projectId) {
+        setSelectedProjectId(e.detail.projectId);
+        setActiveMode("3d-spatial");
+        const proj = GALLERY_PROJECTS.find((p) => p.id === e.detail.projectId);
+        if (proj && activeCategory !== "all") {
+          const matches =
+            activeCategory === "3d-lidar"
+              ? proj.disciplines.includes("3D LiDAR")
+              : activeCategory === "2d-segmentation"
+              ? proj.disciplines.includes("2D Segmentation")
+              : activeCategory === "semantic"
+              ? proj.disciplines.includes("Semantic Segmentation")
+              : activeCategory === "instance"
+              ? proj.disciplines.includes("Instance Segmentation")
+              : activeCategory === "bounding-box"
+              ? proj.disciplines.includes("Bounding box")
+              : activeCategory === "polygon"
+              ? proj.disciplines.includes("Polygon")
+              : false;
+          if (!matches) {
+            setActiveCategory("all");
+          }
+        }
+      }
+      if (e.detail?.category) {
+        setActiveCategory(e.detail.category as StudioCategory);
+      }
+    };
+
+    const handleSelectDiscipline = (
+      e: CustomEvent<{ discipline?: string; category?: string }>
+    ) => {
+      if (e.detail?.category) {
+        setActiveCategory(e.detail.category as StudioCategory);
+      } else if (e.detail?.discipline === "Data Entry") {
+        setActiveCategory("data-entry");
+      } else if (e.detail?.discipline === "Virtual Assistant Services") {
+        setActiveCategory("virtual-assistant");
+      }
+    };
+
+    window.addEventListener(
+      "launch-workbench",
+      handleLaunchWorkbench as EventListener
+    );
+    window.addEventListener(
+      "select-discipline",
+      handleSelectDiscipline as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "launch-workbench",
+        handleLaunchWorkbench as EventListener
+      );
+      window.removeEventListener(
+        "select-discipline",
+        handleSelectDiscipline as EventListener
+      );
+    };
+  }, [activeCategory]);
+
   // -------------------------------------------------------------
   // THREE.JS 3D SPATIAL CANVAS INITIALIZATION & UPDATE
   // -------------------------------------------------------------
   useEffect(() => {
-    if (activeMode !== "3d-spatial") return;
+    if (activeMode !== "3d-spatial" || isNonVisionCategory) return;
     const container = threeMountRef.current;
     if (!container) return;
 
@@ -84,7 +225,14 @@ export default function InteractiveVisionStudio() {
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.set(0, 0, 4.8);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer: THREE.WebGLRenderer | null = null;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch {
+      return;
+    }
+    if (!renderer) return;
+
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -130,12 +278,11 @@ export default function InteractiveVisionStudio() {
     // Floating 3D Bounding Wireframe Boxes
     const wireframeGroup = new THREE.Group();
     activeProject.boxes.forEach((box) => {
-      // Map normalized 0-100% to 3D plane coordinates
       const bx = (box.x / 100 - 0.5) * planeW;
       const by = -(box.y / 100 - 0.5) * planeH;
       const bw = (box.w / 100) * planeW;
       const bh = (box.h / 100) * planeH;
-      const bz = 0.35; // depth offset toward viewer
+      const bz = 0.35;
 
       const bGeom = new THREE.BoxGeometry(bw, bh, bz);
       const bEdges = new THREE.EdgesGeometry(bGeom);
@@ -154,7 +301,7 @@ export default function InteractiveVisionStudio() {
     mainMesh.add(wireframeGroup);
 
     // 3D LiDAR point cloud layer
-    const ptsCount = 2000;
+    const ptsCount = 2200;
     const ptsPositions = new Float32Array(ptsCount * 3);
     const ptsColors = new Float32Array(ptsCount * 3);
     const colorCyan = new THREE.Color(0x00d4ff);
@@ -164,7 +311,7 @@ export default function InteractiveVisionStudio() {
       const idx = i * 3;
       const px = (Math.random() - 0.5) * (planeW * 1.05);
       const py = (Math.random() - 0.5) * (planeH * 1.05);
-      const pz = 0.05 + Math.random() * 0.45; // pop out
+      const pz = 0.05 + Math.random() * 0.45;
 
       ptsPositions[idx] = px;
       ptsPositions[idx + 1] = py;
@@ -183,7 +330,7 @@ export default function InteractiveVisionStudio() {
       size: 0.03,
       vertexColors: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.75,
       blending: THREE.AdditiveBlending,
     });
     const pointCloud = new THREE.Points(ptsGeom, ptsMat);
@@ -201,19 +348,80 @@ export default function InteractiveVisionStudio() {
     laserPlane.position.z = 0.12;
     mainMesh.add(laserPlane);
 
-    // Mouse tilt interaction
+    // 3D Pointer drag & touch controls with directional locking
+    let isPointerDown = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let prevX = 0;
+    let prevY = 0;
+    let isIntentionalHorizontalDrag = false;
+
     let targetRotX = 0;
     let targetRotY = 0;
+    let currentRotX = 0;
+    let currentRotY = 0;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      targetRotY = x * 0.35;
-      targetRotX = -y * 0.25;
+    const targetCameraPos = new THREE.Vector3(0, 0, 4.8);
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      isPointerDown = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      prevX = e.clientX;
+      prevY = e.clientY;
+      isIntentionalHorizontalDrag = false;
     };
 
-    container.addEventListener("mousemove", handleMouseMove);
+    const onPointerMove = (e: PointerEvent) => {
+      if (isPointerDown) {
+        const deltaX = e.clientX - prevX;
+        const deltaY = e.clientY - prevY;
+        const totalX = Math.abs(e.clientX - dragStartX);
+        const totalY = Math.abs(e.clientY - dragStartY);
+
+        // Lock horizontal orbit drag if movement is dominant
+        if (!isIntentionalHorizontalDrag && totalX > 8 && totalX > totalY) {
+          isIntentionalHorizontalDrag = true;
+          try {
+            container.setPointerCapture(e.pointerId);
+          } catch {
+            // Ignore
+          }
+        }
+
+        if (isIntentionalHorizontalDrag || e.pointerType === "mouse") {
+          targetRotY += deltaX * 0.008;
+          targetRotX = Math.max(-0.65, Math.min(0.65, targetRotX - deltaY * 0.007));
+        }
+
+        prevX = e.clientX;
+        prevY = e.clientY;
+      } else if (e.pointerType === "mouse") {
+        // Subtle hover tilt on desktop when not dragging
+        const rect = container.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        targetRotY = THREE.MathUtils.lerp(targetRotY, x * 0.35, 0.08);
+        targetRotX = THREE.MathUtils.lerp(targetRotX, -y * 0.25, 0.08);
+      }
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (isPointerDown) {
+        isPointerDown = false;
+        try {
+          container.releasePointerCapture(e.pointerId);
+        } catch {
+          // Ignore
+        }
+      }
+    };
+
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", onPointerUp);
+    container.addEventListener("pointercancel", onPointerUp);
 
     const handleResize = () => {
       if (!container) return;
@@ -223,28 +431,80 @@ export default function InteractiveVisionStudio() {
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };
-    window.addEventListener("resize", handleResize);
 
-    // Render loop
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (entry.isIntersecting && !animId) {
+          animId = requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
     let laserDir = 1;
     const animate = (time: number) => {
+      if (!isVisible) {
+        animId = 0;
+        return;
+      }
       animId = requestAnimationFrame(animate);
 
-      // Smooth camera / mesh tilt
-      mainMesh.rotation.y += (targetRotY - mainMesh.rotation.y) * 0.08;
-      mainMesh.rotation.x += (targetRotX - mainMesh.rotation.x) * 0.08;
+      currentRotY = THREE.MathUtils.lerp(currentRotY, targetRotY, 0.08);
+      currentRotX = THREE.MathUtils.lerp(currentRotX, targetRotX, 0.08);
+      mainMesh.rotation.y = currentRotY;
+      mainMesh.rotation.x = currentRotX;
 
-      // Move laser scanner
+      camera.position.lerp(targetCameraPos, 0.08);
+
       laserPlane.position.y += 0.015 * laserDir;
       if (laserPlane.position.y > planeH / 2) laserDir = -1;
       if (laserPlane.position.y < -planeH / 2) laserDir = 1;
 
-      // Animate points
       pointCloud.position.z = Math.sin(time * 0.003) * 0.03;
 
       renderer.render(scene, camera);
     };
     animId = requestAnimationFrame(animate);
+
+    const applyCameraPreset = (preset: StudioCameraPreset) => {
+      if (preset === "front") {
+        targetRotX = 0;
+        targetRotY = 0;
+        targetCameraPos.set(0, 0, 4.8);
+      } else if (preset === "isometric") {
+        targetRotX = 0.28;
+        targetRotY = 0.45;
+        targetCameraPos.set(0.6, 0.4, 4.6);
+      } else if (preset === "bev") {
+        targetRotX = 0.68;
+        targetRotY = 0;
+        targetCameraPos.set(0, 1.4, 4.1);
+      } else {
+        targetRotX = 0.12;
+        targetRotY = 0.22;
+        targetCameraPos.set(0, 0, 4.8);
+      }
+    };
+
+    const applyDepthScale = (scale: number) => {
+      wireframeGroup.scale.z = scale;
+      pointCloud.scale.z = scale;
+    };
+
+    const resetCamera = () => {
+      targetRotX = 0;
+      targetRotY = 0;
+      targetCameraPos.set(0, 0, 4.8);
+    };
+
+    applyDepthScale(depthScale);
+    applyCameraPreset(cameraPreset);
 
     threeSceneRef.current = {
       scene,
@@ -254,10 +514,27 @@ export default function InteractiveVisionStudio() {
       wireframeBoxes: wireframeGroup,
       pointCloud,
       laserPlane,
+      setCameraPreset: applyCameraPreset,
+      setDepthScale: applyDepthScale,
+      resetCamera,
       cleanup: () => {
-        cancelAnimationFrame(animId);
-        container.removeEventListener("mousemove", handleMouseMove);
+        if (animId) cancelAnimationFrame(animId);
+        observer.disconnect();
+        container.removeEventListener("pointerdown", onPointerDown);
+        container.removeEventListener("pointermove", onPointerMove);
+        container.removeEventListener("pointerup", onPointerUp);
+        container.removeEventListener("pointercancel", onPointerUp);
         window.removeEventListener("resize", handleResize);
+        texture.dispose();
+        wireframeGroup.children.forEach((c) => {
+          const m = c as THREE.LineSegments;
+          m.geometry?.dispose();
+          if (Array.isArray(m.material)) {
+            m.material.forEach((mat) => mat.dispose());
+          } else {
+            m.material?.dispose();
+          }
+        });
         planeGeom.dispose();
         planeMat.dispose();
         edges.dispose();
@@ -278,9 +555,8 @@ export default function InteractiveVisionStudio() {
         threeSceneRef.current.cleanup();
       }
     };
-  }, [activeMode, activeProject]);
+  }, [activeMode, activeProject, isNonVisionCategory, depthScale, cameraPreset]);
 
-  // Update Three.js layer visibility when state changes
   useEffect(() => {
     if (threeSceneRef.current) {
       threeSceneRef.current.wireframeBoxes.visible = showBoxes;
@@ -361,7 +637,6 @@ export default function InteractiveVisionStudio() {
     if (!isDrawing || !currentDraw) return;
     setIsDrawing(false);
 
-    // Calculate IoU with closest ground-truth box
     if (activeProject.boxes.length === 0 || currentDraw.w < 2 || currentDraw.h < 2) {
       return;
     }
@@ -393,23 +668,26 @@ export default function InteractiveVisionStudio() {
     if (roundedIoU >= 80) {
       setChallengeResult({
         score: roundedIoU,
-        message: `Outstanding! IoU: ${roundedIoU}% — Exceptional spatial accuracy. Everlyn maintains 99.4%+ consistent accuracy on 500+ frames daily.`,
+        message: `Outstanding! IoU: ${roundedIoU}% — Exceptional spatial accuracy. Everlyn maintains 99.4%+ consistent accuracy across high-volume production datasets.`,
       });
     } else if (roundedIoU >= 50) {
       setChallengeResult({
         score: roundedIoU,
-        message: `Good attempt! IoU: ${roundedIoU}% — Precision labeling requires sub-pixel boundary tuning. Everlyn achieves 99.8% precision with verified QA.`,
+        message: `Good attempt! IoU: ${roundedIoU}% — Computer vision models require sub-pixel tight boundaries. Everlyn delivers 99.8% precision with multi-tier QA audits.`,
       });
     } else {
       setChallengeResult({
         score: roundedIoU,
-        message: `IoU: ${roundedIoU}% — Computer vision models degrade rapidly with misaligned boundaries. Hire Everlyn to guarantee pristine, model-ready annotations!`,
+        message: `IoU: ${roundedIoU}% — Autonomous vehicles fail when bounding boxes clip or bleed. Partner with Everlyn to ensure flawless, model-ready annotations!`,
       });
     }
   };
 
   return (
-    <section id="interactive-studio" className="w-full py-20 md:py-32 relative bg-surface-container-lowest overflow-hidden">
+    <section
+      id="interactive-studio"
+      className="w-full py-20 md:py-32 relative bg-surface-container-lowest overflow-hidden scroll-mt-20"
+    >
       {/* Background Ambient Glows */}
       <div className="absolute top-1/4 -left-48 w-96 h-96 bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-48 w-96 h-96 bg-secondary/15 rounded-full blur-[140px] pointer-events-none" />
@@ -417,7 +695,7 @@ export default function InteractiveVisionStudio() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary font-label-mono text-[11px] tracking-widest uppercase mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary font-label-mono text-[11px] tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(0,212,255,0.15)]">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             ACTIONS SPEAK LOUDER THAN WORDS // INTERACTIVE WORKBENCH
           </div>
@@ -426,541 +704,1023 @@ export default function InteractiveVisionStudio() {
             <span className="text-gradient-primary block sm:inline">Inspect The Precision Yourself.</span>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-white/70 font-light leading-relaxed">
-            Test the caliber of data annotation that powers autonomous driving and computer vision pipelines.
-            Interact with authentic 3D LiDAR point clouds, drag the semantic segmentation curtain, and verify sub-pixel edge boundaries.
+            Test the caliber of computer vision datasets and operational workflows that power high-growth teams.
+            Tilt 3D LiDAR point clouds, drag the semantic curtain, and audit cleaned datasets live.
           </p>
         </div>
 
-        {/* Dataset Category Filters */}
+        {/* All 8 Disciplines + All Filter Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
           {[
-            { id: "all", label: "All Datasets (9)", icon: "grid_view" },
-            { id: "lidar", label: "3D LiDAR Point Clouds (4)", icon: "radar" },
-            { id: "segmentation", label: "Semantic Segmentation (5)", icon: "layers" },
+            { id: "all", label: "All Datasets", count: GALLERY_PROJECTS.length, icon: "grid_view" },
+            {
+              id: "3d-lidar",
+              label: "3D LiDAR",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("3D LiDAR")).length,
+              icon: "radar",
+            },
+            {
+              id: "2d-segmentation",
+              label: "2D Segmentation",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("2D Segmentation")).length,
+              icon: "aspect_ratio",
+            },
+            {
+              id: "semantic",
+              label: "Semantic Segmentation",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("Semantic Segmentation")).length,
+              icon: "layers",
+            },
+            {
+              id: "instance",
+              label: "Instance Segmentation",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("Instance Segmentation")).length,
+              icon: "polyline",
+            },
+            {
+              id: "bounding-box",
+              label: "Bounding Box",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("Bounding box")).length,
+              icon: "crop_free",
+            },
+            {
+              id: "polygon",
+              label: "Polygon",
+              count: GALLERY_PROJECTS.filter((p) => p.disciplines.includes("Polygon")).length,
+              icon: "draw",
+            },
+            {
+              id: "data-entry",
+              label: "Data Entry",
+              count: NON_VISION_DELIVERABLES.filter((d) => d.discipline === "Data Entry").length,
+              icon: "table_chart",
+            },
+            {
+              id: "virtual-assistant",
+              label: "Virtual Assistant",
+              count: NON_VISION_DELIVERABLES.filter((d) => d.discipline === "Virtual Assistant Services").length,
+              icon: "person_check",
+            },
           ].map((cat) => (
             <button
               key={cat.id}
               onClick={() => {
-                setActiveCategory(cat.id as "all" | "lidar" | "segmentation");
+                setActiveCategory(cat.id as StudioCategory);
                 soundFx.playClick();
               }}
-              className={`px-4 py-2 rounded-full font-label-mono text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full font-label-mono text-xs uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
                 activeCategory === cat.id
-                  ? "bg-primary text-on-primary font-bold shadow-[0_0_20px_rgba(0,212,255,0.3)]"
+                  ? "bg-primary text-black font-bold shadow-[0_0_20px_rgba(0,212,255,0.35)]"
                   : "glass-pill text-white/70 hover:text-white hover:border-white/20"
               }`}
             >
               <span className="material-symbols-outlined text-sm">{cat.icon}</span>
               <span>{cat.label}</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  activeCategory === cat.id ? "bg-black/25 text-black font-bold" : "bg-white/10 text-white/40"
+                }`}
+              >
+                {cat.count}
+              </span>
             </button>
           ))}
         </div>
 
-        {/* Horizontal Project Carousel / Thumbnails */}
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-8 scrollbar-none snap-x">
-          {filteredProjects.map((proj) => {
-            const isSelected = proj.id === activeProject.id;
-            return (
-              <button
-                key={proj.id}
-                onClick={() => handleSelectProject(proj.id)}
-                className={`snap-start shrink-0 text-left w-64 md:w-72 p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
-                  isSelected
-                    ? "glass-panel border-primary bg-primary/10 shadow-[0_0_25px_rgba(0,212,255,0.2)]"
-                    : "glass-card border-white/10 hover:border-white/25 hover:bg-white/5 opacity-80 hover:opacity-100"
-                }`}
-              >
-                <div className="relative w-full h-24 rounded-lg overflow-hidden mb-2.5 bg-black/40">
-                  <Image
-                    src={proj.image}
-                    alt={proj.title}
-                    fill
-                    className="object-cover"
-                    sizes="280px"
-                  />
-                  <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[9px] font-label-mono text-primary border border-primary/20">
-                    IoU: {proj.iouScore}
-                  </div>
-                  <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded bg-tertiary/20 backdrop-blur-md text-[9px] font-label-mono text-tertiary border border-tertiary/30">
-                    QA PASS
-                  </div>
-                </div>
-                <h4 className="font-display text-xs font-semibold text-white line-clamp-1">
-                  {proj.title}
-                </h4>
-                <p className="font-label-mono text-[10px] text-white/50 mt-1 line-clamp-1">
-                  {proj.sensorType}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Main Interactive Stage Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Main Viewport (Col 8) */}
-          <div className="lg:col-span-8 flex flex-col gap-4">
-            {/* Viewport Action Mode Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl glass-panel border border-white/10">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                {[
-                  { id: "3d-spatial", label: "3D Spatial Tilt", icon: "view_in_ar" },
-                  { id: "curtain-split", label: "Curtain Split", icon: "compare" },
-                  { id: "inspector", label: "Precision Inspector", icon: "center_focus_strong" },
-                  { id: "challenge", label: "Label It Yourself", icon: "draw" },
-                ].map((mode) => (
-                  <button
-                    key={mode.id}
-                    onClick={() => {
-                      setActiveMode(mode.id as StudioMode);
-                      soundFx.playSwitch();
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-label-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
-                      activeMode === mode.id
-                        ? "bg-white/15 text-white border border-white/30 font-semibold"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-sm">{mode.icon}</span>
-                    <span className="hidden sm:inline">{mode.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Layer Toggles */}
-              <div className="flex items-center gap-2 text-xs font-label-mono">
-                <button
-                  onClick={() => {
-                    setShowBoxes(!showBoxes);
-                    soundFx.playClick();
-                  }}
-                  className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
-                    showBoxes
-                      ? "border-primary text-primary bg-primary/10"
-                      : "border-white/15 text-white/40 hover:text-white"
-                  }`}
-                  title="Toggle 3D Bounding Boxes"
-                >
-                  3D Boxes
-                </button>
-                <button
-                  onClick={() => {
-                    setShowPointCloud(!showPointCloud);
-                    soundFx.playClick();
-                  }}
-                  className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
-                    showPointCloud
-                      ? "border-secondary text-secondary-fixed-dim bg-secondary/15"
-                      : "border-white/15 text-white/40 hover:text-white"
-                  }`}
-                  title="Toggle LiDAR Point Cloud"
-                >
-                  Point Cloud
-                </button>
-                <button
-                  onClick={() => {
-                    setShowScanline(!showScanline);
-                    soundFx.playClick();
-                  }}
-                  className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
-                    showScanline
-                      ? "border-tertiary text-tertiary bg-tertiary/10"
-                      : "border-white/15 text-white/40 hover:text-white"
-                  }`}
-                  title="Toggle Radar Scan Beam"
-                >
-                  Laser Beam
-                </button>
-              </div>
-            </div>
-
-            {/* Viewport Canvas Container */}
-            <div className="relative w-full h-[400px] sm:h-[480px] md:h-[540px] rounded-2xl overflow-hidden glass-panel border border-white/15 shadow-2xl bg-black">
-              {/* MODE 1: 3D SPATIAL TILT (Three.js WebGL) */}
-              {activeMode === "3d-spatial" && (
-                <div className="relative w-full h-full">
-                  <div ref={threeMountRef} className="w-full h-full cursor-move" />
-                  <div className="absolute bottom-4 left-4 pointer-events-none px-3 py-1.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 font-label-mono text-[10px] text-white/70">
-                    <span className="text-primary font-bold">MOVE CURSOR</span> TO TILT 3D PERSPECTIVE // DEPTH SHADER ON
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 2: CURTAIN SPLIT (Raw vs Ground Truth) */}
-              {activeMode === "curtain-split" && (
-                <div
-                  ref={curtainContainerRef}
-                  onPointerDown={handlePointerDownCurtain}
-                  className="relative w-full h-full cursor-ew-resize select-none overflow-hidden"
-                >
-                  {/* Base Layer: Ground Truth (Full Color Annotated) */}
-                  <div className="absolute inset-0">
-                    <Image
-                      src={activeProject.image}
-                      alt="Ground Truth Annotated"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 800px"
-                    />
-                    <div className="absolute top-4 right-4 z-10 px-2.5 py-1 rounded bg-black/70 backdrop-blur-md border border-primary/40 font-label-mono text-[10px] text-primary">
-                      EVERLYN&apos;S LABELED TRUTH // {activeProject.iouScore} IoU
-                    </div>
-                  </div>
-
-                  {/* Overlaid Layer: Raw Unannotated (Clipped by slider) */}
-                  <div
-                    className="absolute inset-0 overflow-hidden"
-                    style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
-                  >
-                    <Image
-                      src={activeProject.image}
-                      alt="Raw Sensor Stream"
-                      fill
-                      className="object-cover grayscale contrast-125 brightness-75"
-                      sizes="(max-width: 1024px) 100vw, 800px"
-                    />
-                    <div className="absolute inset-0 bg-blue-950/20 mix-blend-color" />
-                    <div className="absolute top-4 left-4 z-10 px-2.5 py-1 rounded bg-black/70 backdrop-blur-md border border-white/20 font-label-mono text-[10px] text-white/70">
-                      RAW UNLABELED SENSOR FEED
-                    </div>
-                  </div>
-
-                  {/* Divider Line & Handle */}
-                  <div
-                    className="absolute top-0 bottom-0 w-[2px] bg-primary shadow-[0_0_15px_rgba(0,212,255,0.8)] z-20 pointer-events-none"
-                    style={{ left: `${sliderPosition}%` }}
-                  >
-                    <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,1)]">
-                      <span className="material-symbols-outlined text-base">code</span>
-                    </div>
-                  </div>
-
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white/80 font-label-mono text-[10px]">
-                    DRAG CURTAIN TO AUDIT SUB-PIXEL EDGE ALIGNMENT
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 3: PRECISION INSPECTOR */}
-              {activeMode === "inspector" && (
-                <div className="relative w-full h-full select-none">
-                  <Image
-                    src={activeProject.image}
-                    alt={activeProject.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 800px"
-                  />
-
-                  {/* Interactive clickable bounding boxes */}
-                  {showBoxes &&
-                    activeProject.boxes.map((box) => {
-                      const isSelected = selectedBox?.id === box.id;
-                      const isHovered = hoveredBox?.id === box.id;
-                      return (
-                        <div
-                          key={box.id}
-                          onClick={() => {
-                            setSelectedBox(box);
-                            soundFx.playLock();
-                          }}
-                          onMouseEnter={() => {
-                            setHoveredBox(box);
-                            soundFx.playBeep();
-                          }}
-                          onMouseLeave={() => setHoveredBox(null)}
-                          className={`absolute border-2 transition-all duration-200 cursor-pointer ${
-                            isSelected
-                              ? "border-primary bg-primary/25 shadow-[0_0_20px_rgba(0,212,255,0.5)] z-20"
-                              : isHovered
-                              ? "border-tertiary bg-tertiary/20 z-15"
-                              : "border-primary/80 bg-primary/10 z-10"
-                          }`}
-                          style={{
-                            left: `${box.x}%`,
-                            top: `${box.y}%`,
-                            width: `${box.w}%`,
-                            height: `${box.h}%`,
-                          }}
-                        >
-                          <div className="absolute -top-6 left-0 bg-black/80 border border-primary/50 text-primary px-1.5 py-0.5 rounded text-[9px] font-label-mono whitespace-nowrap">
-                            {box.label} [{box.confidence}%]
-                          </div>
-                          {box.depthMeters && (
-                            <div className="absolute -bottom-5 right-0 bg-black/80 text-white/70 px-1 rounded text-[8px] font-label-mono">
-                              d: {box.depthMeters}m
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-
-                  {/* Corner Inspection Floating Card */}
-                  {selectedBox && (
-                    <div className="absolute top-4 left-4 z-30 max-w-xs p-4 rounded-xl glass-panel border border-primary shadow-2xl animate-fade-in-up">
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="font-label-mono text-[10px] uppercase tracking-wider text-primary font-bold">
-                          OBJECT TELEMETRY
-                        </span>
-                        <button
-                          onClick={() => setSelectedBox(null)}
-                          className="text-white/60 hover:text-white text-xs font-bold cursor-pointer"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <h5 className="text-white font-display text-sm font-semibold">{selectedBox.label}</h5>
-                      <div className="mt-2 space-y-1 font-label-mono text-[10px] text-white/70">
-                        <div className="flex justify-between">
-                          <span>Normalized Coord:</span>
-                          <strong className="text-white">X:{selectedBox.x}%, Y:{selectedBox.y}%</strong>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Dimensions:</span>
-                          <strong className="text-white">W:{selectedBox.w}%, H:{selectedBox.h}%</strong>
-                        </div>
-                        {selectedBox.depthMeters && (
-                          <div className="flex justify-between">
-                            <span>Calculated Depth:</span>
-                            <strong className="text-primary">{selectedBox.depthMeters}m</strong>
-                          </div>
-                        )}
-                        {selectedBox.orientationDeg !== undefined && (
-                          <div className="flex justify-between">
-                            <span>Yaw Orientation:</span>
-                            <strong className="text-tertiary">{selectedBox.orientationDeg}°</strong>
-                          </div>
-                        )}
-                        <div className="flex justify-between">
-                          <span>Verified Confidence:</span>
-                          <strong className="text-tertiary">{selectedBox.confidence}%</strong>
-                        </div>
-                        <div className="mt-2 pt-2 border-t border-white/10 text-tertiary flex items-center gap-1 text-[9px]">
-                          <span className="material-symbols-outlined text-xs">verified</span>
-                          <span>QA PASSED — VERIFIED BY EVERLYN LINDA</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute bottom-4 left-4 pointer-events-none px-3 py-1 rounded bg-black/70 backdrop-blur-md border border-white/10 font-label-mono text-[10px] text-white/70">
-                    CLICK ANY BOUNDING BOX TO AUDIT ITS 3D SPATIAL PARAMETERS
-                  </div>
-                </div>
-              )}
-
-              {/* MODE 4: LABEL IT YOURSELF CHALLENGE */}
-              {activeMode === "challenge" && (
-                <div
-                  onMouseDown={handleChallengeMouseDown}
-                  onMouseMove={handleChallengeMouseMove}
-                  onMouseUp={handleChallengeMouseUp}
-                  className="relative w-full h-full cursor-crosshair select-none"
-                >
-                  <Image
-                    src={activeProject.image}
-                    alt="Draw challenge"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 800px"
-                  />
-
-                  {/* Draw Preview Box */}
-                  {currentDraw && (
-                    <div
-                      className="absolute border-2 border-dashed border-amber-400 bg-amber-400/20 pointer-events-none"
-                      style={{
-                        left: `${currentDraw.x}%`,
-                        top: `${currentDraw.y}%`,
-                        width: `${currentDraw.w}%`,
-                        height: `${currentDraw.h}%`,
-                      }}
-                    >
-                      <div className="absolute -top-5 left-0 bg-black/80 text-amber-300 text-[9px] px-1 font-label-mono">
-                        Drawing Test BBox...
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Challenge Result Popup */}
-                  {challengeResult && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-30">
-                      <div className="max-w-md w-full p-6 rounded-2xl glass-panel border border-primary text-center shadow-2xl animate-fade-in-up">
-                        <div className="w-12 h-12 rounded-full bg-primary/20 text-primary border border-primary/40 mx-auto flex items-center justify-center mb-3">
-                          <span className="material-symbols-outlined text-2xl">speed</span>
-                        </div>
-                        <h4 className="font-display text-lg font-bold text-white mb-2">
-                          Precision Verification Result
-                        </h4>
-                        <div className="text-3xl font-display font-black text-gradient-primary my-3">
-                          {challengeResult.score}% IoU Match
-                        </div>
-                        <p className="font-body-md text-xs sm:text-sm text-white/80 mb-6 leading-relaxed">
-                          {challengeResult.message}
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <button
-                            onClick={() => {
-                              setChallengeResult(null);
-                              setCurrentDraw(null);
-                              soundFx.playClick();
-                            }}
-                            className="px-4 py-2 rounded-full border border-white/20 text-white font-label-mono text-xs uppercase tracking-wider hover:bg-white/10 cursor-pointer"
-                          >
-                            Try Another Object
-                          </button>
-                          <Link
-                            href="/contact"
-                            className="px-6 py-2 rounded-full bg-primary text-on-primary font-label-mono text-xs uppercase tracking-wider font-bold hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] cursor-pointer"
-                          >
-                            Hire Everlyn For Your Team
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {!currentDraw && !challengeResult && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-amber-400/40 text-amber-300 font-label-mono text-xs text-center">
-                      CLICK & DRAG TO DRAW A BOUNDING BOX ON ANY CAR OR OBSTACLE
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Corner HUD Styling */}
-              <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-primary pointer-events-none" />
-              <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-primary pointer-events-none" />
-              <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-primary pointer-events-none" />
-              <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-primary pointer-events-none" />
-            </div>
-
-            {/* Class Taxonomy Pills */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="font-label-mono text-[11px] text-white/50 uppercase tracking-wider mr-1">
-                Detected Ontology:
-              </span>
-              {activeProject.classes.map((cls) => {
-                const isIsolated = isolatedClass === cls.name;
+        {/* ========================================================================= */}
+        {/* VIEW A: NON-VISION WORKBENCH (Data Entry & Virtual Assistant Services)    */}
+        {/* ========================================================================= */}
+        {isNonVisionCategory ? (
+          <div className="space-y-6">
+            {/* Non-Vision Sub-Selector Pills */}
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none snap-x">
+              {filteredNonVision.map((deliv) => {
+                const isSelected = deliv.id === activeNonVision.id;
                 return (
                   <button
-                    key={cls.name}
+                    key={deliv.id}
                     onClick={() => {
-                      setIsolatedClass(isIsolated ? null : cls.name);
+                      setSelectedNonVisionId(deliv.id);
                       soundFx.playClick();
                     }}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-label-mono transition-all cursor-pointer ${
-                      isIsolated
-                        ? "bg-white/20 border border-white text-white font-bold"
-                        : "glass-pill text-white/70 hover:text-white"
+                    className={`snap-start shrink-0 text-left p-4 rounded-2xl border transition-all duration-300 cursor-pointer min-w-[280px] max-w-[340px] flex flex-col justify-between ${
+                      isSelected
+                        ? "glass-panel border-secondary bg-secondary/10 shadow-[0_0_25px_rgba(245,158,11,0.2)]"
+                        : "glass-card border-white/10 hover:border-white/25 hover:bg-white/5 opacity-80 hover:opacity-100"
                     }`}
                   >
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: cls.color }}
-                    />
-                    <span>{cls.name}</span>
-                    <span className="text-[10px] text-white/40">({cls.count})</span>
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="material-symbols-outlined text-secondary text-lg">{deliv.icon}</span>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-label-mono bg-tertiary/20 text-tertiary border border-tertiary/30">
+                          {deliv.badge}
+                        </span>
+                      </div>
+                      <h4 className="font-display text-sm font-bold text-white line-clamp-1 mb-1">
+                        {deliv.title}
+                      </h4>
+                      <p className="font-label-mono text-[10px] text-white/50 line-clamp-1">
+                        {deliv.categoryLabel}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
             </div>
-          </div>
 
-          {/* Right QA Telemetry & Conversion Card (Col 4) */}
-          <div className="lg:col-span-4 flex flex-col gap-5">
-            {/* QA Audit Spec Card */}
-            <div className="glass-panel rounded-2xl p-6 border border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-              
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                <div>
-                  <span className="font-label-mono text-[10px] uppercase tracking-widest text-primary block">
-                    QUALITY ASSURANCE DOSSIER
-                  </span>
-                  <h3 className="font-display text-lg font-bold text-white mt-0.5">
-                    {activeProject.title}
-                  </h3>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="font-display text-2xl font-bold text-gradient-primary">
-                    {activeProject.iouScore}
-                  </span>
-                  <span className="font-label-mono text-[9px] text-tertiary">IoU ACCURACY</span>
-                </div>
+            {/* Interactive Operations Stage */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Stage: Live Interactive Simulator (Col 8) */}
+              <div className="lg:col-span-8 glass-panel rounded-2xl md:rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+                {activeCategory === "data-entry" ? (
+                  <div>
+                    {/* Live Dataset Cleaner Header */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
+                      <div>
+                        <span className="font-label-mono text-[10px] uppercase tracking-widest text-secondary block mb-1">
+                          LIVE SIMULATION BENCHMARK
+                        </span>
+                        <h3 className="font-display text-lg sm:text-xl font-bold text-white">
+                          AI Evaluation Dataset Normalizer &amp; Cleaned Schema
+                        </h3>
+                      </div>
+
+                      {/* State Switcher Toggle */}
+                      <div className="flex items-center p-1 rounded-full bg-black/60 border border-white/15">
+                        <button
+                          onClick={() => {
+                            setDataEntryCleanState("raw");
+                            soundFx.playClick();
+                          }}
+                          className={`px-3 py-1 rounded-full font-label-mono text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                            dataEntryCleanState === "raw"
+                              ? "bg-red-500/20 text-red-300 font-bold border border-red-500/40"
+                              : "text-white/50 hover:text-white"
+                          }`}
+                        >
+                          Raw Brief (Contaminated)
+                        </button>
+                        <button
+                          onClick={() => {
+                            setDataEntryCleanState("cleaned");
+                            soundFx.playLock();
+                          }}
+                          className={`px-3 py-1 rounded-full font-label-mono text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                            dataEntryCleanState === "cleaned"
+                              ? "bg-tertiary text-black font-bold shadow-[0_0_15px_rgba(34,197,94,0.4)]"
+                              : "text-white/50 hover:text-white"
+                          }`}
+                        >
+                          Everlyn&apos;s Cleaned Truth
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Interactive Table Simulation */}
+                    <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/60 mb-6">
+                      <table className="w-full text-left font-label-mono text-xs">
+                        <thead>
+                          <tr className="border-b border-white/10 bg-white/5 text-white/50 text-[10px] uppercase">
+                            <th className="p-3">Record ID</th>
+                            <th className="p-3">Annotator</th>
+                            <th className="p-3">Class Label</th>
+                            <th className="p-3">Date Submitted</th>
+                            <th className="p-3">Confidence</th>
+                            <th className="p-3">Audit Flag</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {dataEntryCleanState === "raw" ? (
+                            <>
+                              <tr className="bg-red-950/20 text-red-200">
+                                <td className="p-3">REC-001</td>
+                                <td className="p-3">john m</td>
+                                <td className="p-3 text-red-400 line-through">Pedestrian</td>
+                                <td className="p-3 text-red-400">01/04/2026</td>
+                                <td className="p-3">0.85</td>
+                                <td className="p-3 text-red-400 font-bold">Casing Drift</td>
+                              </tr>
+                              <tr className="bg-red-950/20 text-red-200">
+                                <td className="p-3">REC-002</td>
+                                <td className="p-3 text-red-400">[NULL]</td>
+                                <td className="p-3">vehicle_sedan</td>
+                                <td className="p-3">2026/04/02</td>
+                                <td className="p-3 text-red-400">99.5% (Non-float)</td>
+                                <td className="p-3 text-red-400 font-bold">Malformed Field</td>
+                              </tr>
+                              <tr className="bg-red-950/20 text-red-200">
+                                <td className="p-3">REC-003</td>
+                                <td className="p-3">sarah_k</td>
+                                <td className="p-3">traffic_cone</td>
+                                <td className="p-3">2026-04-02</td>
+                                <td className="p-3">0.92</td>
+                                <td className="p-3 text-red-400 font-bold">Duplicate Row</td>
+                              </tr>
+                            </>
+                          ) : (
+                            <>
+                              <tr className="bg-emerald-950/20 text-emerald-100">
+                                <td className="p-3 text-primary">REC-001</td>
+                                <td className="p-3">John M.</td>
+                                <td className="p-3 text-tertiary font-bold">pedestrian</td>
+                                <td className="p-3">2026-04-01 (ISO 8601)</td>
+                                <td className="p-3">0.850</td>
+                                <td className="p-3 text-tertiary font-bold">✓ Standardized</td>
+                              </tr>
+                              <tr className="bg-emerald-950/20 text-emerald-100">
+                                <td className="p-3 text-primary">REC-002</td>
+                                <td className="p-3 text-white">QA_OVERRIDE_01</td>
+                                <td className="p-3 text-tertiary font-bold">vehicle_sedan</td>
+                                <td className="p-3">2026-04-02 (ISO 8601)</td>
+                                <td className="p-3">0.995</td>
+                                <td className="p-3 text-tertiary font-bold">✓ Normalized Float</td>
+                              </tr>
+                              <tr className="bg-emerald-950/20 text-emerald-100">
+                                <td className="p-3 text-primary">REC-003</td>
+                                <td className="p-3">Sarah K.</td>
+                                <td className="p-3 text-tertiary font-bold">traffic_cone</td>
+                                <td className="p-3">2026-04-02 (ISO 8601)</td>
+                                <td className="p-3">0.920</td>
+                                <td className="p-3 text-tertiary font-bold">✓ Deduplicated</td>
+                              </tr>
+                            </>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs font-label-mono text-white/60">
+                      <span>Audit Result: 99.8% Ground Truth Verified</span>
+                      <span className="text-primary">Zero Coordinate Drift Guarantee</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {/* Executive Virtual Assistant Inbox Zero & SLA Stage */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 mb-6">
+                      <div>
+                        <span className="font-label-mono text-[10px] uppercase tracking-widest text-tertiary block mb-1">
+                          OPERATIONS COMMAND CENTER
+                        </span>
+                        <h3 className="font-display text-lg sm:text-xl font-bold text-white">
+                          Executive Email Architecture &amp; Priority Triage Desk
+                        </h3>
+                      </div>
+
+                      {/* Filter Buttons */}
+                      <div className="flex items-center gap-1 p-1 rounded-full bg-black/60 border border-white/15">
+                        {[
+                          { id: "all", label: "Inbox Zero" },
+                          { id: "urgent", label: "Urgent P1" },
+                          { id: "clients", label: "Clients" },
+                        ].map((btn) => (
+                          <button
+                            key={btn.id}
+                            onClick={() => {
+                              setActiveInboxFilter(btn.id as typeof activeInboxFilter);
+                              soundFx.playClick();
+                            }}
+                            className={`px-3 py-1 rounded-full font-label-mono text-[11px] uppercase transition-all cursor-pointer ${
+                              activeInboxFilter === btn.id
+                                ? "bg-tertiary text-black font-bold"
+                                : "text-white/50 hover:text-white"
+                            }`}
+                          >
+                            {btn.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Triage Queue List */}
+                    <div className="space-y-2.5 mb-6">
+                      <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-ping shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-display text-xs font-bold text-white">
+                                Investor Contract Addendum (Founders Request)
+                              </span>
+                              <span className="px-2 py-0.2 rounded bg-red-500/20 text-red-300 text-[9px] font-label-mono">
+                                SLA &lt;15 MIN
+                              </span>
+                            </div>
+                            <p className="font-label-mono text-[11px] text-white/50 mt-0.5">
+                              Triage Action: Prepared draft response with clause checklist for CEO one-click dispatch.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-tertiary font-label-mono text-[10px] shrink-0">READY</span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="w-2.5 h-2.5 rounded-full bg-primary shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-display text-xs font-bold text-white">
+                                Multi-Timezone Board Meeting Scheduling (US &amp; Europe)
+                              </span>
+                              <span className="px-2 py-0.2 rounded bg-primary/20 text-primary text-[9px] font-label-mono">
+                                CALENDAR SYNC
+                              </span>
+                            </div>
+                            <p className="font-label-mono text-[11px] text-white/50 mt-0.5">
+                              Triage Action: Resolved 3 conflicting holds; issued automated calendar invites with Zoom links.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-tertiary font-label-mono text-[10px] shrink-0">RESOLVED</span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="w-2.5 h-2.5 rounded-full bg-tertiary shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-display text-xs font-bold text-white">
+                                Tier 1 Customer Ticket Resolution (Zendesk / Intercom)
+                              </span>
+                              <span className="px-2 py-0.2 rounded bg-tertiary/20 text-tertiary text-[9px] font-label-mono">
+                                98.5% CSAT
+                              </span>
+                            </div>
+                            <p className="font-label-mono text-[11px] text-white/50 mt-0.5">
+                              Triage Action: Addressed billing query within 12 minutes using verified onboarding macros.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-tertiary font-label-mono text-[10px] shrink-0">RESOLVED</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs font-label-mono text-white/60">
+                      <span>Executive Productivity Reclaimed: 15+ Hours Weekly</span>
+                      <span className="text-tertiary">Strict NDA Compliance</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <p className="font-body-md text-xs text-white/75 leading-relaxed mb-5">
-                {activeProject.description}
-              </p>
+              {/* Right Stage: Metrics & Direct Conversion (Col 4) */}
+              <div className="lg:col-span-4 flex flex-col gap-5">
+                <div className="glass-panel rounded-2xl p-6 border border-white/10">
+                  <span className="font-label-mono text-[10px] uppercase tracking-widest text-secondary block mb-1">
+                    OPERATIONAL SPECIFICATION
+                  </span>
+                  <h4 className="font-display text-lg font-bold text-white mb-2">
+                    {activeNonVision.title}
+                  </h4>
+                  <p className="font-body-md text-xs text-white/70 leading-relaxed mb-5">
+                    {activeNonVision.description}
+                  </p>
 
-              {/* Technical Spec List */}
-              <div className="space-y-2.5 font-label-mono text-xs border-t border-white/10 pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Sensor Rig:</span>
-                  <span className="text-white text-right text-[11px] max-w-[200px] truncate">
-                    {activeProject.sensorType}
-                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-label-mono mb-5">
+                    {activeNonVision.metrics.map((m) => (
+                      <div key={m.label} className="p-2.5 rounded-lg bg-black/40 border border-white/5">
+                        <span className="text-white/40 block text-[9px] uppercase">{m.label}</span>
+                        <span className="text-white font-semibold">{m.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10">
+                    <span className="font-label-mono text-[10px] text-white/50 uppercase tracking-widest block mb-2">
+                      Tools &amp; Workspaces
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {activeNonVision.tools.map((t) => (
+                        <span key={t} className="px-2.5 py-0.5 rounded bg-white/5 text-white/75 text-[10px] font-label-mono">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Annotation Tools:</span>
-                  <span className="text-primary text-[11px]">
-                    {activeProject.tools.join(" • ")}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Point / Mask Density:</span>
-                  <span className="text-white text-[11px]">
-                    {activeProject.pointCount || activeProject.polygonCount}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Edge Boundary Tolerance:</span>
-                  <span className="text-tertiary text-[11px]">&lt; 1.2px (Sub-pixel)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Model Compatibility:</span>
-                  <span className="text-white text-[11px]">Cityscapes / KITTI / nuScenes</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white/50">Lead Annotator:</span>
-                  <span className="text-white font-semibold text-[11px]">Everlyn Linda (QA Pass)</span>
+
+                {/* Direct CTA */}
+                <div className="glass-panel rounded-2xl p-6 border border-secondary/30 bg-gradient-to-b from-secondary/5 to-transparent">
+                  <div className="flex items-center gap-2 text-tertiary font-label-mono text-xs mb-2">
+                    <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
+                    <span>AVAILABLE FOR ENGAGEMENT</span>
+                  </div>
+                  <h5 className="font-display text-base font-bold text-white mb-2">
+                    Need Reliable Daily Execution For Your Business?
+                  </h5>
+                  <p className="text-xs text-white/70 mb-5 leading-relaxed">
+                    Everlyn manages spreadsheets, databases, executive inboxes, and customer ticketing with obsessive attention to detail.
+                  </p>
+                  <Link
+                    href="/contact"
+                    className="w-full py-3 rounded-xl bg-secondary text-surface-container-lowest font-label-mono text-xs uppercase tracking-widest font-bold text-center flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(245,158,11,0.35)]"
+                  >
+                    <span>Hire Everlyn For {activeNonVision.discipline}</span>
+                    <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                  </Link>
                 </div>
               </div>
             </div>
+          </div>
+        ) : (
+          /* ========================================================================= */
+          /* VIEW B: COMPUTER VISION WORKBENCH (3D LiDAR, 2D Seg, Semantic, etc.)     */
+          /* ========================================================================= */
+          <div>
+            {/* Horizontal Project Carousel / Thumbnails */}
+            <div className="flex gap-3 overflow-x-auto pb-4 mb-8 scrollbar-none snap-x">
+              {filteredProjects.map((proj) => {
+                const isSelected = proj.id === activeProject.id;
+                return (
+                  <button
+                    key={proj.id}
+                    onClick={() => handleSelectProject(proj.id)}
+                    className={`snap-start shrink-0 text-left w-64 md:w-72 p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
+                      isSelected
+                        ? "glass-panel border-primary bg-primary/10 shadow-[0_0_25px_rgba(0,212,255,0.2)]"
+                        : "glass-card border-white/10 hover:border-white/25 hover:bg-white/5 opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <div className="relative w-full h-24 rounded-lg overflow-hidden mb-2.5 bg-black/40">
+                      <Image
+                        src={proj.image}
+                        alt={proj.title}
+                        fill
+                        className="object-cover"
+                        sizes="280px"
+                      />
+                      <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[9px] font-label-mono text-primary border border-primary/20">
+                        IoU: {proj.iouScore}
+                      </div>
+                      <div className="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded bg-tertiary/20 backdrop-blur-md text-[9px] font-label-mono text-tertiary border border-tertiary/30">
+                        QA PASS
+                      </div>
+                    </div>
+                    <h4 className="font-display text-xs font-semibold text-white line-clamp-1">
+                      {proj.title}
+                    </h4>
+                    <div className="flex items-center gap-1.5 mt-1.5 overflow-hidden">
+                      <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-label-mono text-primary truncate">
+                        {proj.disciplines[0] || proj.categoryLabel}
+                      </span>
+                      <span className="font-label-mono text-[9px] text-white/40 truncate">
+                        {proj.sensorType.split("+")[0]}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-            {/* Direct Conversion Card */}
-            <div className="glass-panel rounded-2xl p-6 border border-primary/30 relative overflow-hidden bg-gradient-to-b from-primary/5 to-transparent shadow-[0_0_30px_rgba(0,212,255,0.1)]">
-              <div className="flex items-center gap-2 text-tertiary font-label-mono text-xs mb-2">
-                <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
-                AVAILABLE FOR HIRE // REMOTE WORLDWIDE
+            {/* Main Interactive Stage Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Main Viewport (Col 8) */}
+              <div className="lg:col-span-8 flex flex-col gap-4">
+                {/* Viewport Action Mode Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl glass-panel border border-white/10">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {[
+                      { id: "3d-spatial", label: "3D Spatial Tilt", icon: "view_in_ar" },
+                      { id: "curtain-split", label: "Curtain Split", icon: "compare" },
+                      { id: "inspector", label: "Precision Inspector", icon: "center_focus_strong" },
+                      { id: "challenge", label: "Label It Yourself", icon: "draw" },
+                    ].map((mode) => (
+                      <button
+                        key={mode.id}
+                        onClick={() => {
+                          setActiveMode(mode.id as StudioMode);
+                          soundFx.playSwitch();
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-label-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+                          activeMode === mode.id
+                            ? "bg-white/15 text-white border border-white/30 font-semibold"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-sm">{mode.icon}</span>
+                        <span className="hidden sm:inline">{mode.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Layer Toggles */}
+                  <div className="flex items-center gap-2 text-xs font-label-mono">
+                    <button
+                      onClick={() => {
+                        setShowBoxes(!showBoxes);
+                        soundFx.playClick();
+                      }}
+                      className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
+                        showBoxes
+                          ? "border-primary text-primary bg-primary/10"
+                          : "border-white/15 text-white/40 hover:text-white"
+                      }`}
+                      title="Toggle 3D Bounding Boxes"
+                    >
+                      3D Boxes
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowPointCloud(!showPointCloud);
+                        soundFx.playClick();
+                      }}
+                      className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
+                        showPointCloud
+                          ? "border-secondary text-secondary-fixed-dim bg-secondary/15"
+                          : "border-white/15 text-white/40 hover:text-white"
+                      }`}
+                      title="Toggle LiDAR Point Cloud"
+                    >
+                      Point Cloud
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowScanline(!showScanline);
+                        soundFx.playClick();
+                      }}
+                      className={`px-2.5 py-1 rounded border text-[10px] cursor-pointer transition-colors ${
+                        showScanline
+                          ? "border-tertiary text-tertiary bg-tertiary/10"
+                          : "border-white/15 text-white/40 hover:text-white"
+                      }`}
+                      title="Toggle Radar Scan Beam"
+                    >
+                      Laser Beam
+                    </button>
+                  </div>
+                </div>
+
+                {/* Viewport Canvas Container */}
+                <div className="relative w-full h-[400px] sm:h-[480px] md:h-[540px] rounded-2xl overflow-hidden glass-panel border border-white/15 shadow-2xl bg-black">
+                  {/* MODE 1: 3D SPATIAL TILT (Three.js WebGL) */}
+                  {activeMode === "3d-spatial" && (
+                    <div className="relative w-full h-full">
+                      <div
+                        ref={threeMountRef}
+                        className="w-full h-full cursor-grab active:cursor-grabbing touch-pan-y"
+                        style={{ touchAction: "pan-y" }}
+                      />
+
+                      {/* Top-Right 3D Studio Perspective & Depth Controls */}
+                      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex flex-wrap items-center gap-1.5 p-1 rounded-full bg-black/75 border border-white/15 backdrop-blur-xl shadow-xl">
+                        {[
+                          { id: "orbit", label: "Orbit", icon: "orbit" },
+                          { id: "front", label: "Front", icon: "square" },
+                          { id: "isometric", label: "Iso", icon: "view_in_ar" },
+                          { id: "bev", label: "BEV", icon: "vertical_align_bottom" },
+                        ].map((p) => (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              setCameraPreset(p.id as StudioCameraPreset);
+                              threeSceneRef.current?.setCameraPreset(p.id as StudioCameraPreset);
+                              soundFx.playClick();
+                            }}
+                            className={`px-2 py-0.5 rounded-full font-label-mono text-[9px] uppercase tracking-wider transition-all cursor-pointer ${
+                              cameraPreset === p.id
+                                ? "bg-primary text-black font-bold shadow-[0_0_8px_rgba(0,212,255,0.5)]"
+                                : "text-white/60 hover:text-white hover:bg-white/10"
+                            }`}
+                            title={`Camera preset: ${p.label}`}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+
+                        <span className="w-[1px] h-3 bg-white/20" />
+
+                        {/* 3D Depth Toggle */}
+                        <button
+                          onClick={() => {
+                            const newScale = depthScale === 1.0 ? 2.2 : 1.0;
+                            setDepthScale(newScale);
+                            threeSceneRef.current?.setDepthScale(newScale);
+                            soundFx.playSwitch();
+                          }}
+                          className={`px-2 py-0.5 rounded-full font-label-mono text-[9px] uppercase tracking-wider border cursor-pointer transition-all ${
+                            depthScale > 1.0
+                              ? "bg-tertiary text-black font-bold border-tertiary shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                              : "border-white/20 text-white/70 hover:text-white"
+                          }`}
+                          title="Toggle 3D Cuboid & Point Cloud Depth Extrusion"
+                        >
+                          {depthScale > 1.0 ? "2.2x 3D" : "1.0x 3D"}
+                        </button>
+
+                        {/* Reset button */}
+                        <button
+                          onClick={() => {
+                            setCameraPreset("orbit");
+                            threeSceneRef.current?.resetCamera();
+                            soundFx.playClick();
+                          }}
+                          className="px-2 py-0.5 rounded-full font-label-mono text-[9px] uppercase tracking-wider text-white/50 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                          title="Reset Camera Orientation"
+                        >
+                          ↺
+                        </button>
+                      </div>
+
+                      {/* Top-Left Telemetry Reticle Badge */}
+                      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 pointer-events-none flex flex-wrap gap-1.5 font-label-mono text-[10px]">
+                        <span className="px-2.5 py-0.5 rounded-full bg-black/75 border border-primary/40 text-primary backdrop-blur-md">
+                          SENSOR: {activeProject.sensorType.split("+")[0].trim()}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-black/75 border border-tertiary/40 text-tertiary backdrop-blur-md">
+                          IoU {activeProject.iouScore}
+                        </span>
+                      </div>
+
+                      {/* Bottom Instruction Bar */}
+                      <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 pointer-events-none flex items-center justify-between gap-2 px-3 py-1.5 rounded-md bg-black/70 backdrop-blur-md border border-white/10 font-label-mono text-[10px] text-white/70">
+                        <div>
+                          <span className="text-primary font-bold">DRAG TO ORBIT 360°</span> • TOUCH &amp; PAN ENABLED • DEPTH EXTRUSION {depthScale}x
+                        </div>
+                        <div className="hidden sm:block text-white/40">
+                          {activeProject.boxes.length} CUBOIDS • 2,200 POINTS
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MODE 2: CURTAIN SPLIT (Raw vs Ground Truth) */}
+                  {activeMode === "curtain-split" && (
+                    <div
+                      ref={curtainContainerRef}
+                      onPointerDown={handlePointerDownCurtain}
+                      className="relative w-full h-full cursor-ew-resize select-none overflow-hidden"
+                    >
+                      {/* Base Layer: Ground Truth (Full Color Annotated) */}
+                      <div className="absolute inset-0">
+                        <Image
+                          src={activeProject.image}
+                          alt="Ground Truth Annotated"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 800px"
+                        />
+                        <div className="absolute top-4 right-4 z-10 px-2.5 py-1 rounded bg-black/70 backdrop-blur-md border border-primary/40 font-label-mono text-[10px] text-primary">
+                          EVERLYN&apos;S LABELED TRUTH // {activeProject.iouScore} IoU
+                        </div>
+                      </div>
+
+                      {/* Overlaid Layer: Raw Unannotated (Clipped by slider) */}
+                      <div
+                        className="absolute inset-0 overflow-hidden"
+                        style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
+                      >
+                        <Image
+                          src={activeProject.image}
+                          alt="Raw Sensor Stream"
+                          fill
+                          className="object-cover grayscale contrast-125 brightness-75"
+                          sizes="(max-width: 1024px) 100vw, 800px"
+                        />
+                        <div className="absolute inset-0 bg-blue-950/20 mix-blend-color" />
+                        <div className="absolute top-4 left-4 z-10 px-2.5 py-1 rounded bg-black/70 backdrop-blur-md border border-white/20 font-label-mono text-[10px] text-white/70">
+                          RAW UNLABELED SENSOR FEED
+                        </div>
+                      </div>
+
+                      {/* Divider Line & Handle */}
+                      <div
+                        className="absolute top-0 bottom-0 w-[2px] bg-primary shadow-[0_0_15px_rgba(0,212,255,0.8)] z-20 pointer-events-none"
+                        style={{ left: `${sliderPosition}%` }}
+                      >
+                        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,1)]">
+                          <span className="material-symbols-outlined text-base font-bold">code</span>
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-white/80 font-label-mono text-[10px]">
+                        DRAG CURTAIN TO AUDIT SUB-PIXEL EDGE ALIGNMENT
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MODE 3: PRECISION INSPECTOR */}
+                  {activeMode === "inspector" && (
+                    <div className="relative w-full h-full select-none">
+                      <Image
+                        src={activeProject.image}
+                        alt={activeProject.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 800px"
+                      />
+
+                      {/* Interactive clickable bounding boxes */}
+                      {showBoxes &&
+                        activeProject.boxes.map((box) => {
+                          const isSelected = selectedBox?.id === box.id;
+                          const isHovered = hoveredBox?.id === box.id;
+                          return (
+                            <div
+                              key={box.id}
+                              onClick={() => {
+                                setSelectedBox(box);
+                                soundFx.playLock();
+                              }}
+                              onMouseEnter={() => {
+                                setHoveredBox(box);
+                                soundFx.playBeep();
+                              }}
+                              onMouseLeave={() => setHoveredBox(null)}
+                              className={`absolute border-2 transition-all duration-200 cursor-pointer ${
+                                isSelected
+                                  ? "border-primary bg-primary/25 shadow-[0_0_20px_rgba(0,212,255,0.5)] z-20"
+                                  : isHovered
+                                  ? "border-tertiary bg-tertiary/20 z-15"
+                                  : "border-primary/80 bg-primary/10 z-10"
+                              }`}
+                              style={{
+                                left: `${box.x}%`,
+                                top: `${box.y}%`,
+                                width: `${box.w}%`,
+                                height: `${box.h}%`,
+                              }}
+                            >
+                              <div className="absolute -top-6 left-0 bg-black/80 border border-primary/50 text-primary px-1.5 py-0.5 rounded text-[9px] font-label-mono whitespace-nowrap">
+                                {box.label} [{box.confidence}%]
+                              </div>
+                              {box.depthMeters && (
+                                <div className="absolute -bottom-5 right-0 bg-black/80 text-white/70 px-1 rounded text-[8px] font-label-mono">
+                                  d: {box.depthMeters}m
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                      {/* Corner Inspection Floating Card */}
+                      {selectedBox && (
+                        <div className="absolute top-4 left-4 z-30 max-w-xs p-4 rounded-xl glass-panel border border-primary shadow-2xl animate-fade-in-up">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="font-label-mono text-[10px] uppercase tracking-wider text-primary font-bold">
+                              OBJECT TELEMETRY
+                            </span>
+                            <button
+                              onClick={() => setSelectedBox(null)}
+                              className="text-white/60 hover:text-white text-xs font-bold cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                          <h5 className="text-white font-display text-sm font-semibold">{selectedBox.label}</h5>
+                          <div className="mt-2 space-y-1 font-label-mono text-[10px] text-white/70">
+                            <div className="flex justify-between">
+                              <span>Normalized Coord:</span>
+                              <strong className="text-white">
+                                X:{selectedBox.x}%, Y:{selectedBox.y}%
+                              </strong>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Dimensions:</span>
+                              <strong className="text-white">
+                                W:{selectedBox.w}%, H:{selectedBox.h}%
+                              </strong>
+                            </div>
+                            {selectedBox.depthMeters && (
+                              <div className="flex justify-between">
+                                <span>Calculated Depth:</span>
+                                <strong className="text-primary">{selectedBox.depthMeters}m</strong>
+                              </div>
+                            )}
+                            {selectedBox.orientationDeg !== undefined && (
+                              <div className="flex justify-between">
+                                <span>Yaw Orientation:</span>
+                                <strong className="text-tertiary">{selectedBox.orientationDeg}°</strong>
+                              </div>
+                            )}
+                            <div className="flex justify-between">
+                              <span>Verified Confidence:</span>
+                              <strong className="text-tertiary">{selectedBox.confidence}%</strong>
+                            </div>
+                            <div className="mt-2 pt-2 border-t border-white/10 text-tertiary flex items-center gap-1 text-[9px]">
+                              <span className="material-symbols-outlined text-xs">verified</span>
+                              <span>QA PASSED — VERIFIED BY EVERLYN LINDA</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="absolute bottom-4 left-4 pointer-events-none px-3 py-1 rounded bg-black/70 backdrop-blur-md border border-white/10 font-label-mono text-[10px] text-white/70">
+                        CLICK ANY BOUNDING BOX TO AUDIT ITS 3D SPATIAL PARAMETERS
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MODE 4: LABEL IT YOURSELF CHALLENGE */}
+                  {activeMode === "challenge" && (
+                    <div
+                      onMouseDown={handleChallengeMouseDown}
+                      onMouseMove={handleChallengeMouseMove}
+                      onMouseUp={handleChallengeMouseUp}
+                      className="relative w-full h-full cursor-crosshair select-none"
+                    >
+                      <Image
+                        src={activeProject.image}
+                        alt="Draw challenge"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 800px"
+                      />
+
+                      {/* Draw Preview Box */}
+                      {currentDraw && (
+                        <div
+                          className="absolute border-2 border-dashed border-amber-400 bg-amber-400/20 pointer-events-none"
+                          style={{
+                            left: `${currentDraw.x}%`,
+                            top: `${currentDraw.y}%`,
+                            width: `${currentDraw.w}%`,
+                            height: `${currentDraw.h}%`,
+                          }}
+                        >
+                          <div className="absolute -top-5 left-0 bg-black/80 text-amber-300 text-[9px] px-1 font-label-mono">
+                            Drawing Test BBox...
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Challenge Result Popup */}
+                      {challengeResult && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-30">
+                          <div className="max-w-md w-full p-6 rounded-2xl glass-panel border border-primary text-center shadow-2xl animate-fade-in-up">
+                            <div className="w-12 h-12 rounded-full bg-primary/20 text-primary border border-primary/40 mx-auto flex items-center justify-center mb-3">
+                              <span className="material-symbols-outlined text-2xl">speed</span>
+                            </div>
+                            <h4 className="font-display text-lg font-bold text-white mb-2">
+                              Precision Verification Result
+                            </h4>
+                            <div className="text-3xl font-display font-black text-gradient-primary my-3">
+                              {challengeResult.score}% IoU Match
+                            </div>
+                            <p className="font-body-md text-xs sm:text-sm text-white/80 mb-6 leading-relaxed">
+                              {challengeResult.message}
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                              <button
+                                onClick={() => {
+                                  setChallengeResult(null);
+                                  setCurrentDraw(null);
+                                  soundFx.playClick();
+                                }}
+                                className="px-4 py-2 rounded-full border border-white/20 text-white font-label-mono text-xs uppercase tracking-wider hover:bg-white/10 cursor-pointer"
+                              >
+                                Try Another Object
+                              </button>
+                              <Link
+                                href="/contact"
+                                className="px-6 py-2 rounded-full bg-primary text-on-primary font-label-mono text-xs uppercase tracking-wider font-bold hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] cursor-pointer"
+                              >
+                                Hire Everlyn For Your Team
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {!currentDraw && !challengeResult && (
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-amber-400/40 text-amber-300 font-label-mono text-xs text-center">
+                          CLICK &amp; DRAG TO DRAW A BOUNDING BOX ON ANY CAR OR OBSTACLE
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Corner HUD Styling */}
+                  <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-primary pointer-events-none" />
+                  <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-primary pointer-events-none" />
+                  <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-primary pointer-events-none" />
+                  <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-primary pointer-events-none" />
+                </div>
+
+                {/* Class Taxonomy Pills */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="font-label-mono text-[11px] text-white/50 uppercase tracking-wider mr-1">
+                    Detected Ontology:
+                  </span>
+                  {activeProject.classes.map((cls) => {
+                    const isIsolated = isolatedClass === cls.name;
+                    return (
+                      <button
+                        key={cls.name}
+                        onClick={() => {
+                          setIsolatedClass(isIsolated ? null : cls.name);
+                          soundFx.playClick();
+                        }}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-label-mono transition-all cursor-pointer ${
+                          isIsolated
+                            ? "bg-white/20 border border-white text-white font-bold"
+                            : "glass-pill text-white/70 hover:text-white"
+                        }`}
+                      >
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cls.color }} />
+                        <span>{cls.name}</span>
+                        <span className="text-[10px] text-white/40">({cls.count})</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <h4 className="font-display text-base sm:text-lg font-bold text-white mb-2">
-                Need This Level of Accuracy For Your AI Dataset?
-              </h4>
-              <p className="font-body-md text-xs text-white/70 mb-5 leading-relaxed">
-                Everlyn labels 200+ complex frames or 450+ polygons per day with strict adherence to your custom guidelines and ontology schemas.
-              </p>
 
-              <div className="flex flex-col gap-2.5">
-                <Link
-                  href="/contact"
-                  className="w-full py-3 px-4 rounded-xl bg-primary text-on-primary font-label-mono text-xs uppercase tracking-widest font-bold text-center flex items-center justify-center gap-2 hover:shadow-[0_8px_30px_rgba(0,212,255,0.4)] hover:-translate-y-0.5 transition-all"
-                >
-                  <span>Hire Everlyn For Data Annotation</span>
-                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                </Link>
-                <Link
-                  href="/portfolio"
-                  className="w-full py-3 px-4 rounded-xl border border-white/15 text-white font-label-mono text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 hover:border-white/30 hover:bg-white/5 transition-all"
-                >
-                  <span>Explore Full 9-Project Dossier</span>
-                  <span className="material-symbols-outlined text-sm">visibility</span>
-                </Link>
+              {/* Right QA Telemetry & Conversion Card (Col 4) */}
+              <div className="lg:col-span-4 flex flex-col gap-5">
+                {/* QA Audit Spec Card */}
+                <div className="glass-panel rounded-2xl p-6 border border-white/10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+
+                  <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                    <div>
+                      <span className="font-label-mono text-[10px] uppercase tracking-widest text-primary block">
+                        QUALITY ASSURANCE DOSSIER
+                      </span>
+                      <h3 className="font-display text-lg font-bold text-white mt-0.5">
+                        {activeProject.title}
+                      </h3>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="font-display text-2xl font-bold text-gradient-primary">
+                        {activeProject.iouScore}
+                      </span>
+                      <span className="font-label-mono text-[9px] text-tertiary">IoU ACCURACY</span>
+                    </div>
+                  </div>
+
+                  <p className="font-body-md text-xs text-white/75 leading-relaxed mb-5">
+                    {activeProject.description}
+                  </p>
+
+                  {/* Technical Spec List */}
+                  <div className="space-y-2.5 font-label-mono text-xs border-t border-white/10 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Sensor Rig:</span>
+                      <span className="text-white text-right text-[11px] max-w-[200px] truncate">
+                        {activeProject.sensorType}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Annotation Tools:</span>
+                      <span className="text-primary text-[11px]">
+                        {activeProject.tools.join(" • ")}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Point / Mask Density:</span>
+                      <span className="text-white text-[11px]">
+                        {activeProject.pointCount || activeProject.polygonCount}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Edge Boundary Tolerance:</span>
+                      <span className="text-tertiary text-[11px]">&lt; 1.2px (Sub-pixel)</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Model Compatibility:</span>
+                      <span className="text-white text-[11px]">Cityscapes / KITTI / nuScenes</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/50">Lead Annotator:</span>
+                      <span className="text-white font-semibold text-[11px]">Everlyn Linda (QA Pass)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Direct Conversion Card */}
+                <div className="glass-panel rounded-2xl p-6 border border-primary/30 relative overflow-hidden bg-gradient-to-b from-primary/5 to-transparent shadow-[0_0_30px_rgba(0,212,255,0.1)]">
+                  <div className="flex items-center gap-2 text-tertiary font-label-mono text-xs mb-2">
+                    <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
+                    AVAILABLE FOR HIRE // REMOTE WORLDWIDE
+                  </div>
+                  <h4 className="font-display text-base sm:text-lg font-bold text-white mb-2">
+                    Need This Level of Accuracy For Your AI Dataset?
+                  </h4>
+                  <p className="font-body-md text-xs text-white/70 mb-5 leading-relaxed">
+                    Everlyn labels 200+ complex frames or 450+ polygons per day with strict adherence to your custom guidelines and ontology schemas.
+                  </p>
+
+                  <div className="flex flex-col gap-2.5">
+                    <Link
+                      href="/contact"
+                      className="w-full py-3 px-4 rounded-xl bg-primary text-on-primary font-label-mono text-xs uppercase tracking-widest font-bold text-center flex items-center justify-center gap-2 hover:shadow-[0_8px_30px_rgba(0,212,255,0.4)] hover:-translate-y-0.5 transition-all"
+                    >
+                      <span>Hire Everlyn For Data Annotation</span>
+                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </Link>
+                    <Link
+                      href="/portfolio"
+                      className="w-full py-3 px-4 rounded-xl border border-white/15 text-white font-label-mono text-xs uppercase tracking-widest text-center flex items-center justify-center gap-2 hover:border-white/30 hover:bg-white/5 transition-all"
+                    >
+                      <span>Explore All 24 Production Datasets</span>
+                      <span className="material-symbols-outlined text-sm">visibility</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
